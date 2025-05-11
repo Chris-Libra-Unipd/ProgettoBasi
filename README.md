@@ -1,2 +1,18 @@
 # ProgettoBasi
-my name is giovanni giorgio
+
+
+### Idea: MUSEO
+
+Entità:
+- Opera d'arte (generalizzabile)
+- Artista
+- Dipendenti (generalizzabile)
+- Area
+- Mostra
+- Visite guidate (generalizzabile)
+- Biglietti (tipo: adulto, bambino, visita guidata)  
+- Incassi
+
+
+
+### ABSTRACT:
