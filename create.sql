@@ -9,11 +9,11 @@ DROP TABLE  IF EXISTS Dipendenti;
 DROP TABLE  IF EXISTS Aree;
 DROP TABLE  IF EXISTS Autori;
 
-DROP TYPE  IF EXISTS turno;
-DROP TYPE  IF EXISTS tipo;
+DROP TYPE  IF EXISTS Turno;
+DROP TYPE  IF EXISTS Tipo;
 
 
-CREATE TYPE turno AS ENUM (
+CREATE TYPE Turno AS ENUM (
     'Mattina',
     'Pomeriggio'
 );
@@ -52,29 +52,27 @@ CREATE TABLE Argomenti(
 );
 
 CREATE TABLE Esposizioni(
-    Data_Inizio DATE NOT NULL CHECK(Data_Fine IS NULL OR Data_Fine>Data_Inizio),
-    Data_Fine DATE NULL,
     Area VARCHAR(16) NOT NULL,
+    Nome VARCHAR(16) NOT NULL,
     FOREIGN KEY (Area) REFERENCES Aree(Nome)
         ON DELETE NO ACTION 
         ON UPDATE CASCADE,
-    PRIMARY KEY (Data_Inizio,Area)
+    PRIMARY KEY (Area)
 );
 
 CREATE TABLE Visite_Guidate(
     Numero_Partecipanti INT NOT NULL CHECK (Numero_Partecipanti>=0),
     Data_Visita DATE NOT NULL,
-    turno Turno_ NOT NULL,
+    Turno_Visita Turno NOT NULL,
     Guida CHAR(16) NOT NULL,
     Area VARCHAR(16) NOT NULL,
-    Data_Inizio DATE NOT NULL,
     FOREIGN KEY (Guida) REFERENCES Guide(CF)
         ON DELETE NO ACTION
         ON UPDATE CASCADE ,
-    FOREIGN KEY (Area,Data_Inizio) REFERENCES Esposizioni(Area,Data_Inizio)
+    FOREIGN KEY (Area) REFERENCES Esposizioni(Area)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
-    PRIMARY KEY (Data_Visita,Turno_,Area,Data_Inizio,Guida)
+    PRIMARY KEY (Data_Visita,Turno_Visita,Area,Guida)
 );
 
 CREATE TABLE Biglietti (
@@ -95,11 +93,11 @@ CREATE TABLE Ingresso_Libero(
 CREATE TABLE Ingresso_Guidato(
     ID SERIAL PRIMARY KEY,
     Data_Visita DATE NOT NULL,
-    Turno_ turno  NOT NULL,
+    Turno_Visita Turno  NOT NULL,
     Guida CHAR(16) NOT NULL,
     Area VARCHAR(16) NOT NULL,
     Data_Inizio DATE NOT NULL,
-    FOREIGN KEY (Data_Visita,Turno_,Area,Data_Inizio,Guida) Visite_Guidate(Data_Visita,Turno_,Area,Data_Inizio,Guida)
+    FOREIGN KEY (Data_Visita,Turno_Visita,Area,Guida)REFERENCES Visite_Guidate(Data_Visita,Turno_Visita,Area,Guida)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
     FOREIGN KEY (ID) REFERENCES Biglietti(ID)
