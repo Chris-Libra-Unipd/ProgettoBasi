@@ -42,7 +42,6 @@ CREATE TABLE Dipendenti(
 
 CREATE TABLE Guide(
     CF CHAR(16) PRIMARY KEY,
-    Conteggio INT NOT NULL CHECK(Conteggio>=0),
     FOREIGN KEY (CF) REFERENCES Dipendenti(CF)
         ON DELETE NO ACTION 
         ON UPDATE CASCADE
