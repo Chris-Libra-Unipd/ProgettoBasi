@@ -59,11 +59,11 @@ CREATE TABLE Esposizione(
     Nome VARCHAR(16) NOT NULL,
     FOREIGN KEY (Area) REFERENCES Area(Nome)
         ON DELETE NO ACTION 
-        ON UPDATE CASCADE,
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE Artefatto(
-    CHAR(4) Codice PRIMARY KEY,
+    Codice CHAR(4) PRIMARY KEY,
     Nome VARCHAR(32) NOT NULL, 
     Tipologia Tipo NOT NULL, 
     Esposizione VARCHAR(16) NULL,
@@ -78,7 +78,7 @@ CREATE TABLE Visita_Guidata(
     Data_Visita DATE NOT NULL,
     Turno Turni_Giornata NOT NULL,
     Partecipanti INT NOT NULL CHECK (Partecipanti>=0),
-    PRIMARY KEY (Data_Visita,Turno_Visita,Area,Guida),
+    PRIMARY KEY (Data_Visita,Turno,Esposizione,Guida),
 
     FOREIGN KEY (Guida) REFERENCES Guida(CF)
         ON DELETE NO ACTION
@@ -104,7 +104,7 @@ CREATE TABLE Ingresso_Guidato(
     Guida CHAR(16) NOT NULL,
     Esposizione VARCHAR(16) NOT NULL,
     Data_Inizio DATE NOT NULL,
-    FOREIGN KEY (Data_Visita,Turno_Visita,Area,Guida)REFERENCES Visita_Guidata(Data_Visita,Turno,Esposizione,Guida)
+    FOREIGN KEY (Data_Visita,Turno,Esposizione,Guida)REFERENCES Visita_Guidata(Data_Visita,Turno,Esposizione,Guida)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
     FOREIGN KEY (ID) REFERENCES Biglietto(ID)
@@ -137,11 +137,11 @@ CREATE TABLE Conoscenza(
 
 
 CREATE TABLE Creazione(
-    CHAR(4) Codice NOT NULL,
+    Codice CHAR(4) NOT NULL,
     Nome VARCHAR(32) NOT NULL, 
     Cognome VARCHAR(32) NOT NULL,
     DN DATE NOT NULL,
-    PRIMARY Key(Codice, Nome, Cognome, DN)
+    PRIMARY Key(Codice, Nome, Cognome, DN),
     
     FOREIGN KEY (Codice) REFERENCES Artefatto(Codice)
     ON DELETE NO ACTION 
