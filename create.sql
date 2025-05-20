@@ -57,7 +57,11 @@ CREATE TABLE Argomento(
 CREATE TABLE Esposizione(
     Area VARCHAR(32) PRIMARY KEY,
     Nome VARCHAR(32) NOT NULL,
+    Argomento VARCHAR(32) NOT NULL,
     FOREIGN KEY (Area) REFERENCES Area(Nome)
+        ON DELETE NO ACTION 
+        ON UPDATE CASCADE,
+    FOREIGN KEY (Argomento) REFERENCES Argomento(Nome)
         ON DELETE NO ACTION 
         ON UPDATE CASCADE
 );
@@ -196,11 +200,11 @@ INSERT INTO Conoscenza (Argomento, Guida) VALUES
 ('Fotografia', 'VRDGNN80A01D612T');
 
 INSERT INTO Esposizione (Area, Nome) VALUES
-('Area_1', 'Maestri Italiani'),
-('Area_2', 'Luce e Colore'),
-('Area_3', 'Rivoluzioni'),
-('Area_4', 'Oltre i Confini'),
-('Area_5', 'Forme Eterne');
+('Area_1', 'Maestri Italiani','Pittura ad olio'),
+('Area_2', 'Luce e Colore','Pittura ad olio'),
+('Area_3', 'Rivoluzioni',''),
+('Area_4', 'Oltre i Confini',''),
+('Area_5', 'Forme Eterne','Scultura');
 
 INSERT INTO Artefatto (Codice, Nome, Tipologia, Esposizione) VALUES
 ('A001', 'Gioconda', 'Opera', 'Area_1'),
