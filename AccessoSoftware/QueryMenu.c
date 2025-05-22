@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "C:/Program Files/PostgreSQL/17/include/libpq-fe.h" //file .h che si trova in PostgreSQL/17/unclude
+#include "dependencies/include/libpq-fe.h" //file .h che si trova in PostgreSQL/17/unclude 
 
 //ATTENZIONE WINDOWS: creare la cartella dependencies con incluse libpq.dll e libpq.lib nella stessa cartella del file .c, usare il makefile
 
@@ -25,7 +25,6 @@ bool Query1(){
     do_exit(conn);
   }
 
-
   int numero;
   char* nome;
   char* cognome;
@@ -34,13 +33,14 @@ bool Query1(){
   printf("Numero minimo di artefatti: ");
   scanf("%d",&numero);
 
-  //nome e cognome autori vanno scelti dal db
+  //recupero artisti disponibili dal db
   PGresult *ncArtisti = PQexec(conn, "SELECT nome,cognome FROM artista");
   if (PQresultStatus(ncArtisti) != PGRES_TUPLES_OK) 
   {
     fprintf(stderr, "Non è stato restituito un risultato per il seguente errore: %s", PQerrorMessage(conn));
     PQclear(ncArtisti);
     do_exit(conn);
+    return 0;
   }
 
 
@@ -56,21 +56,36 @@ bool Query1(){
 
   printf("Hai scelto %s %s con almeno %d opere\n",nome,cognome,numero);
 
-  char query[150];
-  char nomeArtista[50];
-  char cognomeArtista[50];
+
+  //costruzione query parametrica
+  char query[500];
+  char nomeArtista[20];
+  char cognomeArtista[20];
   strcpy(nomeArtista,nome);
   strcpy(cognomeArtista,cognome);
-  sprintf(query,"SELECT A.Area, A.Inizio, COUNT(*) FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome = \'%s\' AND C.Cognome = \'%s\' GROUP BY A.Area, A.Inizio HAVING COUNT(*) >= %d",nomeArtista,cognomeArtista,numero);
 
-  printf("\n\n%s\n\n",query);
+  sprintf(query, "SELECT A.Area, A.Inizio, COUNT(*) FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome = \'%s\' AND C.Cognome =\'%s\' GROUP BY A.Area, A.Inizio HAVING COUNT(*) >= %d",nome, cognomeArtista, numero);
 
-  //QUA CRASHSA BOHHH
+  //Esecuzione query
+  PGresult *res = PQexec(conn, query);
+  if (PQresultStatus(res) != PGRES_TUPLES_OK) 
+  {
+    fprintf(stderr, "Non è stato restituito un risultato per il seguente errore: %s", PQerrorMessage(conn));
+    PQclear(res);
+    do_exit(conn);
+    return 0;
+  }
 
-  PQclear(ncArtisti); //Chiudi la connessione
+  //stampa risultato
+  if(PQntuples(res) == 0)
+    printf("Non e stato prodotto alcun risultato\n");
+  else
+    printf("Risultato: %s %s %s\n",PQgetvalue(res,0,0),PQgetvalue(res,0,1),PQgetvalue(res,0,2));
+
+  //libera memoria e chiudi connessione
+  PQclear(ncArtisti); 
   PQfinish(conn);
-
-
+  return 1;
 }
 
 //---------------------------------
@@ -141,9 +156,7 @@ bool Query5(){
 
 
 int main(){
-  PGconn * conn ;
-  conn = PQconnectdb ("") ;
-  PQfinish ( conn );
+
   printf("Query menu:\n");
   printf("1- Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore \n");
   printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno \n");
@@ -172,6 +185,7 @@ int main(){
   }
 
 
+    
 
 
 
