@@ -3,7 +3,7 @@ DROP TABLE  IF EXISTS Ingresso_Libero;
 DROP TABLE  IF EXISTS Ingresso_Guidato;
 DROP TABLE  IF EXISTS Biglietto;
 DROP TABLE  IF EXISTS Visita_Guidata;
-DROP TABLE  IF EXISTS Appartenenza_Passata;
+DROP TABLE  IF EXISTS Appartenenza;
 DROP TABLE  IF EXISTS Passata;
 DROP TABLE  IF EXISTS In_Corso;
 DROP TABLE  IF EXISTS Artefatto;
@@ -64,12 +64,7 @@ CREATE TABLE Esposizione(
 CREATE TABLE Artefatto(
     Codice CHAR(4) PRIMARY KEY,
     Nome VARCHAR(32) NOT NULL, 
-    Tipologia Tipo NOT NULL, 
-    Area VARCHAR(32) NULL,
-    Inizio DATE NOT NULL,
-    FOREIGN KEY (Area,Inizio) REFERENCES Esposizione(Area,Inizio)
-        ON DELETE SET NULL 
-        ON UPDATE CASCADE
+    Tipologia Tipo NOT NULL
 );
 
 CREATE TABLE In_Corso(
@@ -95,7 +90,7 @@ CREATE TABLE Passata(
         ON UPDATE CASCADE
 );
 
-CREATE TABLE Appartenenza_Passata(
+CREATE TABLE Appartenenza(
     Area VARCHAR(32) NULL,
     Inizio DATE NOT NULL,
     Artefatto CHAR(4) NOT NULL,
@@ -203,16 +198,16 @@ INSERT INTO Esposizione (Area, Nome, Inizio, Fine, Argomento) VALUES
 ('Area1', 'Modernità in Mostra', '2023-09-01', '2024-01-31', 'Arte Moderna'),
 ('Area2', 'Contemporanei a Confronto', '2023-10-15', '2024-03-15', 'Arte Contemporanea');
 
-INSERT INTO Artefatto (Codice, Nome, Tipologia, Area, Inizio) VALUES
-('A001', 'Monna Lisa', 'Opera', 'Area1', '2023-01-15'),
-('A002', 'Gioconda', 'Opera', 'Area1', '2023-01-15'),
-('A003', 'David', 'Opera', 'Area1', '2023-01-15'),
-('A004', 'Notte Stellata', 'Opera', 'Area2', '2023-02-01'),
-('A005', 'Guernica', 'Opera', 'Area3', '2023-03-10'),
-('A006', 'Le due Frida', 'Opera', 'Area1', '2023-09-01'),
-('A007', 'Ninfee', 'Opera', 'Area2', '2023-02-01'),
-('A008', 'Vaso Antico', 'Reperto', 'Area3', '2023-03-10'),
-('A009', 'Maschera Tribale', 'Reperto', 'Area1', '2023-09-01');
+INSERT INTO Artefatto (Codice, Nome, Tipologia) VALUES
+('A001', 'Monna Lisa', 'Opera'),
+('A002', 'Gioconda', 'Opera'),
+('A003', 'David', 'Opera'),
+('A004', 'Notte Stellata', 'Opera'),
+('A005', 'Guernica', 'Opera'),
+('A006', 'Le due Frida', 'Opera'),
+('A007', 'Ninfee', 'Opera'),
+('A008', 'Vaso Antico', 'Reperto'),
+('A009', 'Maschera Tribale', 'Reperto');
 
 -- Esposizioni passate
 INSERT INTO Passata (Area, Inizio) VALUES
@@ -225,7 +220,7 @@ INSERT INTO In_Corso (Area, Inizio, Curatore) VALUES
 ('Area1', '2023-09-01', 'PLTFRN60D12H501Z'),
 ('Area2', '2023-10-15', 'RSSGPP82E30H501W');
 
-INSERT INTO Appartenenza_Passata (Area, Inizio, Artefatto) VALUES
+INSERT INTO Appartenenza (Area, Inizio, Artefatto) VALUES
 ('Area1', '2023-01-15', 'A001'),
 ('Area1', '2023-01-15', 'A002'),
 ('Area1', '2023-01-15', 'A003'),
