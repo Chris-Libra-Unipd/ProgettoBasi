@@ -48,9 +48,9 @@ CREATE TABLE Guida(
 
 CREATE TABLE Esposizione(
     Area VARCHAR(32) NOT NULL,
-    Nome VARCHAR(32) NOT NULL,
     Inizio DATE NOT NULL,
     Fine DATE NOT NULL CHECK(Inizio <Fine),
+    Nome VARCHAR(32) NOT NULL,
     Argomento VARCHAR(32) NOT NULL,
     PRIMARY KEY(Area,Inizio),
 
@@ -65,19 +65,19 @@ CREATE TABLE Artefatto(
     Codice CHAR(4) PRIMARY KEY,
     Nome VARCHAR(32) NOT NULL, 
     Tipologia Tipo NOT NULL, 
-    Esposizione VARCHAR(32) NULL,
+    Area VARCHAR(32) NULL,
     Inizio DATE NOT NULL,
-    FOREIGN KEY (Esposizione,Inizio) REFERENCES Esposizione(Area,Inizio)
+    FOREIGN KEY (Area,Inizio) REFERENCES Esposizione(Area,Inizio)
         ON DELETE SET NULL 
         ON UPDATE CASCADE
 );
 
 CREATE TABLE In_Corso(
-    Esposizione VARCHAR(32) NULL,
+    Area VARCHAR(32) NULL,
     Inizio DATE NOT NULL,
     Curatore CHAR(16) NOT NULL UNIQUE, 
-    PRIMARY KEY(Esposizione,Inizio),
-    FOREIGN KEY (Esposizione,Inizio) REFERENCES Esposizione(Area,Inizio)
+    PRIMARY KEY(Area,Inizio),
+    FOREIGN KEY (Area,Inizio) REFERENCES Esposizione(Area,Inizio)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
     FOREIGN KEY (Curatore) REFERENCES Guida(CF)
@@ -86,22 +86,22 @@ CREATE TABLE In_Corso(
 );
 
 CREATE TABLE Passata(
-    Esposizione VARCHAR(32) NULL,
+    Area VARCHAR(32) NULL,
     Inizio DATE NOT NULL,
-    PRIMARY KEY(Esposizione,Inizio),
+    PRIMARY KEY(Area,Inizio),
 
-    FOREIGN KEY (Esposizione,Inizio) REFERENCES Esposizione(Area,Inizio)
+    FOREIGN KEY (Area,Inizio) REFERENCES Esposizione(Area,Inizio)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
 );
 
 CREATE TABLE Appartenenza_Passata(
-    Esposizione VARCHAR(32) NULL,
+    Area VARCHAR(32) NULL,
     Inizio DATE NOT NULL,
     Artefatto CHAR(4) NOT NULL,
-    PRIMARY KEY(Esposizione, Inizio, Artefatto),
+    PRIMARY KEY(Area, Inizio, Artefatto),
 
-    FOREIGN KEY (Esposizione,Inizio) REFERENCES Passata(Esposizione,Inizio)
+    FOREIGN KEY (Area,Inizio) REFERENCES Passata(Area,Inizio)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
     FOREIGN KEY (Artefatto) REFERENCES Artefatto(Codice)
@@ -112,19 +112,19 @@ CREATE TABLE Appartenenza_Passata(
 
 CREATE TABLE Visita_Guidata(
     ID INT NOT NULL CHECK (ID>=0) PRIMARY KEY,
-    Esposizione VARCHAR(32) NOT NULL,
-    Inizio_Esp DATE NOT NULL,
+    Area VARCHAR(32) NOT NULL,
+    Inizio DATE NOT NULL,
     Guida CHAR(32) NOT NULL,
     Data_Visita DATE NOT NULL,
     Turno Turni_Giornata NOT NULL,
     Partecipanti INT NOT NULL CHECK (Partecipanti>=0),
-    CONSTRAINT unique_visits UNIQUE (Esposizione, Inizio_Esp, Data_Visita, Turno, Guida),
+    CONSTRAINT unique_visits UNIQUE (Area, Inizio, Data_Visita, Turno, Guida),
 
     FOREIGN KEY (Guida) REFERENCES Guida(CF)
         ON DELETE NO ACTION
         ON UPDATE CASCADE ,
     
-    FOREIGN KEY (Esposizione,Inizio_Esp) REFERENCES Esposizione(Area,Inizio)
+    FOREIGN KEY (Area,Inizio_Esp) REFERENCES Esposizione(Area,Inizio)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
 );
@@ -139,8 +139,8 @@ CREATE TABLE Biglietto (
 
 CREATE TABLE Ingresso_Guidato(
     ID INT NOT NULL CHECK (ID>=0) PRIMARY KEY,
-    Visita INT NOT NULL,
-    FOREIGN KEY (Visita) REFERENCES Visita_Guidata(ID)
+    IDvg INT NOT NULL,
+    FOREIGN KEY (IDvg) REFERENCES Visita_Guidata(ID)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
     FOREIGN KEY (ID) REFERENCES Biglietto(ID)
@@ -161,14 +161,13 @@ CREATE TABLE Creazione(
     Codice CHAR(4) NOT NULL,
     Nome VARCHAR(32) NOT NULL, 
     Cognome VARCHAR(32) NOT NULL,
-    DN DATE NOT NULL,
-    PRIMARY Key(Codice, Nome, Cognome, DN),
+    PRIMARY Key(Codice, Nome, Cognome),
     
     FOREIGN KEY (Codice) REFERENCES Artefatto(Codice)
     ON DELETE NO ACTION 
     ON UPDATE CASCADE,
     
-    FOREIGN KEY (Nome, Cognome, DN) REFERENCES Artista(Nome, Cognome, DN)
+    FOREIGN KEY (Nome, Cognome) REFERENCES Artista(Nome, Cognome)
     ON DELETE NO ACTION 
     ON UPDATE CASCADE
 
@@ -197,14 +196,14 @@ INSERT INTO Guida (CF, Specializzazione) VALUES
 ('PLTFRN60D12H501Z', 'Arte Moderna'),
 ('RSSGPP82E30H501W', 'Arte Contemporanea');
 
-INSERT INTO Esposizione (Area, Nome, Inizio, Fine, Argomento) VALUES
+INSERT INTO Area (Area, Nome, Inizio, Fine, Argomento) VALUES
 ('Area1', 'Maestri Rinascimentali', '2023-01-15', '2023-06-15', 'Rinascimento'),
 ('Area2', 'Luce e Colore', '2023-02-01', '2023-07-31', 'Impressionismo'),
 ('Area3', 'Forme Spezzate', '2023-03-10', '2023-08-20', 'Cubismo'),
 ('Area1', 'Modernità in Mostra', '2023-09-01', '2024-01-31', 'Arte Moderna'),
 ('Area2', 'Contemporanei a Confronto', '2023-10-15', '2024-03-15', 'Arte Contemporanea');
 
-INSERT INTO Artefatto (Codice, Nome, Tipologia, Esposizione, Inizio) VALUES
+INSERT INTO Artefatto (Codice, Nome, Tipologia, Area, Inizio) VALUES
 ('A001', 'Monna Lisa', 'Opera', 'Area1', '2023-01-15'),
 ('A002', 'Gioconda', 'Opera', 'Area1', '2023-01-15'),
 ('A003', 'David', 'Opera', 'Area1', '2023-01-15'),
@@ -216,17 +215,17 @@ INSERT INTO Artefatto (Codice, Nome, Tipologia, Esposizione, Inizio) VALUES
 ('A009', 'Maschera Tribale', 'Reperto', 'Area1', '2023-09-01');
 
 -- Esposizioni passate
-INSERT INTO Passata (Esposizione, Inizio) VALUES
+INSERT INTO Passata (Area, Inizio) VALUES
 ('Area1', '2023-01-15'),
 ('Area2', '2023-02-01'),
 ('Area3', '2023-03-10');
 
 -- Esposizioni in corso
-INSERT INTO In_Corso (Esposizione, Inizio, Curatore) VALUES
+INSERT INTO In_Corso (Area, Inizio, Curatore) VALUES
 ('Area1', '2023-09-01', 'PLTFRN60D12H501Z'),
 ('Area2', '2023-10-15', 'RSSGPP82E30H501W');
 
-INSERT INTO Appartenenza_Passata (Esposizione, Inizio, Artefatto) VALUES
+INSERT INTO Appartenenza_Passata (Area, Inizio, Artefatto) VALUES
 ('Area1', '2023-01-15', 'A001'),
 ('Area1', '2023-01-15', 'A002'),
 ('Area1', '2023-01-15', 'A003'),
@@ -236,7 +235,7 @@ INSERT INTO Appartenenza_Passata (Esposizione, Inizio, Artefatto) VALUES
 ('Area3', '2023-03-10', 'A008');
 
 
-INSERT INTO Visita_Guidata (ID, Esposizione, Inizio_Esp, Guida, Data_Visita, Turno, Partecipanti) VALUES
+INSERT INTO Visita_Guidata (ID, Area, Inizio_Esp, Guida, Data_Visita, Turno, Partecipanti) VALUES
 (1, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Mattina', 15),
 (2, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Pomeriggio', 12),
 (3, 'Area2', '2023-02-01', 'BNCLSN90A41H501X', '2023-03-05', 'Mattina', 20),
@@ -270,10 +269,10 @@ INSERT INTO Ingresso_Libero (ID, Data_Validita) VALUES
 
 
 INSERT INTO Creazione (Codice, Nome, Cognome, DN) VALUES
-('A001', 'Leonardo', 'da Vinci', '1452-04-15'),
-('A002', 'Leonardo', 'da Vinci', '1452-04-15'),
-('A003', 'Michelangelo', 'Buonarroti', '1475-03-06'),
-('A004', 'Vincent', 'van Gogh', '1853-03-30'),
-('A005', 'Pablo', 'Picasso', '1881-10-25'),
-('A006', 'Frida', 'Kahlo', '1907-07-06'),
-('A007', 'Claude', 'Monet', '1840-11-14');
+('A001', 'Leonardo', 'da Vinci'),
+('A002', 'Leonardo', 'da Vinci'),
+('A003', 'Michelangelo', 'Buonarroti'),
+('A004', 'Vincent', 'van Gogh'),
+('A005', 'Pablo', 'Picasso'),
+('A006', 'Frida', 'Kahlo'),
+('A007', 'Claude', 'Monet');
