@@ -1,20 +1,75 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "path/to/libpq-fe.h" //file .h che si trova in PostgreSQL/17/unclude
+#include <stdbool.h>
+#include <string.h>
+#include "C:/Program Files/PostgreSQL/17/include/libpq-fe.h" //file .h che si trova in PostgreSQL/17/unclude
+
+//ATTENZIONE WINDOWS: creare la cartella dependencies con incluse libpq.dll e libpq.lib nella stessa cartella del file .c, usare il makefile
+
+void do_exit(PGconn *conn){
+  PQfinish(conn);
+  exit(1);
+  }
 
 bool Query1(){
   /*
   Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore.
   Parametri: n = numero artefatti, a = nome autore, c = cognome autore
   */
-  int numero;
-  std::string nome;
-  std::string cognome;
 
-  printf("Inserire i parametri della query\n:");
-  scanf("Numero minimo di artefatti: %d",&numero);
+
+  PGconn *conn = PQconnectdb("dbname=sampleDB password=myPostGres user=postgres"); //Connessione al database
+  if (PQstatus(conn) == CONNECTION_BAD) //Se non è possibile connettersi
+  {
+    fprintf(stderr, "Connection to database failed: %s", PQerrorMessage(conn));
+    do_exit(conn);
+  }
+
+
+  int numero;
+  char* nome;
+  char* cognome;
+
+  printf("Inserire i parametri della query\n");
+  printf("Numero minimo di artefatti: ");
+  scanf("%d",&numero);
 
   //nome e cognome autori vanno scelti dal db
+  PGresult *ncArtisti = PQexec(conn, "SELECT nome,cognome FROM artista");
+  if (PQresultStatus(ncArtisti) != PGRES_TUPLES_OK) 
+  {
+    fprintf(stderr, "Non è stato restituito un risultato per il seguente errore: %s", PQerrorMessage(conn));
+    PQclear(ncArtisti);
+    do_exit(conn);
+  }
+
+
+  printf("Seleziona uno dei seguenti artisti\n");
+  for(int i = 0; i < PQntuples(ncArtisti);i++){
+      printf("%d - %s %s\n",i,PQgetvalue(ncArtisti,i,0),PQgetvalue(ncArtisti,i,1));
+  }
+  int scelta = 0;
+  scanf("%d",&scelta);
+
+  nome = PQgetvalue(ncArtisti,scelta,0);
+  cognome = PQgetvalue(ncArtisti,scelta,1);
+
+  printf("Hai scelto %s %s con almeno %d opere\n",nome,cognome,numero);
+
+  char query[150];
+  char nomeArtista[50];
+  char cognomeArtista[50];
+  strcpy(nomeArtista,nome);
+  strcpy(cognomeArtista,cognome);
+  sprintf(query,"SELECT A.Area, A.Inizio, COUNT(*) FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome = \'%s\' AND C.Cognome = \'%s\' GROUP BY A.Area, A.Inizio HAVING COUNT(*) >= %d",nomeArtista,cognomeArtista,numero);
+
+  printf("\n\n%s\n\n",query);
+
+  //QUA CRASHSA BOHHH
+
+  PQclear(ncArtisti); //Chiudi la connessione
+  PQfinish(conn);
+
 
 }
 
@@ -26,7 +81,7 @@ bool Query2(){
   Parametri: arg = argomento
   */
 
-  std::string argomento;
+  char* argomento;
 
   printf("Inserire i parametri della query\n:");
   //argomento va scelto dal db
@@ -57,7 +112,7 @@ bool Query4(){
 
   */
 
-  std::string argomento;
+  char* argomento;
 
   printf("Inserire i parametri della query\n:");
   //argomento va scelto dal db
@@ -73,8 +128,8 @@ bool Query5(){
 
   */
 
-  std::string nome;
-  std::string cognome;
+  char* nome;
+  char* cognome;
 
   printf("Inserire i parametri della query\n:");
   //nome e cognome autori vanno scelti dal db
