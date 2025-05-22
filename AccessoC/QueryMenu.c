@@ -18,7 +18,7 @@ bool Query1(){
   */
 
 
-  PGconn *conn = PQconnectdb("dbname=sampleDB password=myPostGres user=postgres"); //Connessione al database
+  PGconn *conn = PQconnectdb("dbname=primo password=12340 user=postgres"); //Connessione al database
   if (PQstatus(conn) == CONNECTION_BAD) //Se non è possibile connettersi
   {
     fprintf(stderr, "Connection to database failed: %s", PQerrorMessage(conn));
@@ -59,8 +59,8 @@ bool Query1(){
 
   //costruzione query parametrica
   char query[500];
-  char nomeArtista[20];
-  char cognomeArtista[20];
+  char nomeArtista[32];
+  char cognomeArtista[32];
   strcpy(nomeArtista,nome);
   strcpy(cognomeArtista,cognome);
 
