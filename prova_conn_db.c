@@ -33,20 +33,20 @@ else {
     PGresult * res ;
     res = PQexec ( conn , " SELECT * FROM Artefatto ") ;
 
+/*
     checkResults(res,conn);
     printResults(res, conn);
 
 
-    char* nome="Leonardo",cogn="da Vinci";
+    char* nome="Leonardo",*cogn="da Vinci";
     int nArt=2;
-
 
 
     PGresult * stmt = PQprepare ( conn ,"query1", "SELECT A.Area, A.Inizio, COUNT(*) FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome =$1::varchar AND C.Cognome =$2::varchar  GROUP BY A.Area, A.Inizio HAVING COUNT(*) >=$3::Int ", 3, NULL);
     PQexecPrepared ( conn , "query1", 1 , nome , NULL , 0, 0) ;
     PQexecPrepared ( conn , "query1", 2 , cogn , NULL , 0, 0) ;
     PQexecPrepared ( conn , "query1", 3 , &nArt , NULL , 0, 0) ;
-  /*
+  
   Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore.
   Parametri: n = numero artefatti, a = nome autore, c = cognome autore
   */
