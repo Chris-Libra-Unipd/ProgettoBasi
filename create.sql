@@ -31,7 +31,7 @@ CREATE TABLE Artista(
     Cognome VARCHAR(32) NOT NULL,
     DN DATE NOT NULL,
     DM DATE NULL,
-    PRIMARY KEY (Nome,Cognome,DN)
+    PRIMARY KEY (Nome,Cognome)
 
 );
 
@@ -124,7 +124,7 @@ CREATE TABLE Visita_Guidata(
         ON DELETE NO ACTION
         ON UPDATE CASCADE ,
     
-    FOREIGN KEY (Area,Inizio_Esp) REFERENCES Esposizione(Area,Inizio)
+    FOREIGN KEY (Area,Inizio) REFERENCES Esposizione(Area,Inizio)
         ON DELETE NO ACTION
         ON UPDATE CASCADE
 );
@@ -196,7 +196,7 @@ INSERT INTO Guida (CF, Specializzazione) VALUES
 ('PLTFRN60D12H501Z', 'Arte Moderna'),
 ('RSSGPP82E30H501W', 'Arte Contemporanea');
 
-INSERT INTO Area (Area, Nome, Inizio, Fine, Argomento) VALUES
+INSERT INTO Esposizione (Area, Nome, Inizio, Fine, Argomento) VALUES
 ('Area1', 'Maestri Rinascimentali', '2023-01-15', '2023-06-15', 'Rinascimento'),
 ('Area2', 'Luce e Colore', '2023-02-01', '2023-07-31', 'Impressionismo'),
 ('Area3', 'Forme Spezzate', '2023-03-10', '2023-08-20', 'Cubismo'),
@@ -235,7 +235,7 @@ INSERT INTO Appartenenza_Passata (Area, Inizio, Artefatto) VALUES
 ('Area3', '2023-03-10', 'A008');
 
 
-INSERT INTO Visita_Guidata (ID, Area, Inizio_Esp, Guida, Data_Visita, Turno, Partecipanti) VALUES
+INSERT INTO Visita_Guidata (ID, Area, Inizio, Guida, Data_Visita, Turno, Partecipanti) VALUES
 (1, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Mattina', 15),
 (2, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Pomeriggio', 12),
 (3, 'Area2', '2023-02-01', 'BNCLSN90A41H501X', '2023-03-05', 'Mattina', 20),
@@ -254,7 +254,7 @@ INSERT INTO Biglietto (ID, Data_Acq, EMail) VALUES
 
 
 -- Ingressi guidati
-INSERT INTO Ingresso_Guidato (ID, Visita) VALUES
+INSERT INTO Ingresso_Guidato (ID, IDvg) VALUES
 (1, 1),
 (2, 1),
 (3, 3),
@@ -268,7 +268,7 @@ INSERT INTO Ingresso_Libero (ID, Data_Validita) VALUES
 
 
 
-INSERT INTO Creazione (Codice, Nome, Cognome, DN) VALUES
+INSERT INTO Creazione (Codice, Nome, Cognome) VALUES
 ('A001', 'Leonardo', 'da Vinci'),
 ('A002', 'Leonardo', 'da Vinci'),
 ('A003', 'Michelangelo', 'Buonarroti'),
