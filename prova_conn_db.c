@@ -11,7 +11,7 @@
 
 
 void checkResults ( PGresult * res , const PGconn * conn );
-void printResults ( PGresult * res);
+void printResults ( PGresult * res, const PGconn * conn );
 
 
 int main(){
@@ -34,15 +34,31 @@ else {
     res = PQexec ( conn , " SELECT * FROM Artefatto ") ;
 
     checkResults(res,conn);
-    printResults(res);
+    printResults(res, conn);
+
+
+    char* nome="Leonardo",cogn="da Vinci";
+    int nArt=2;
+
+
+
+    PGresult * stmt = PQprepare ( conn ,"query1", "SELECT A.Area, A.Inizio, COUNT(*) FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome =$1::varchar AND C.Cognome =$2::varchar  GROUP BY A.Area, A.Inizio HAVING COUNT(*) >=$3::Int ", 3, NULL);
+    PQexecPrepared ( conn , "query1", 1 , nome , NULL , 0, 0) ;
+    PQexecPrepared ( conn , "query1", 2 , cogn , NULL , 0, 0) ;
+    PQexecPrepared ( conn , "query1", 3 , &nArt , NULL , 0, 0) ;
+  /*
+  Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore.
+  Parametri: n = numero artefatti, a = nome autore, c = cognome autore
+  */
+
+
+
+
 
 
 
     PQfinish ( conn );
 }
-
-
-
 
   return 0;
 }
@@ -57,22 +73,30 @@ exit (1) ;
 }
 
 
-void printResults ( PGresult * res){
+void printResults ( PGresult * res, const PGconn * conn ){
+    checkResults(res,conn);
+    int indent=32;
     // Trovo il numero di tuple e campi selezionati
     int tuple = PQntuples ( res ) ;
     int campi = PQnfields ( res ) ;
     
     // Stampo le intestazioni delle colonne
     for ( int i = 0; i < campi ; i ++) {
-    printf ("%s\t\t", PQfname ( res , i ));
+        char * temp=PQfname ( res , i );
+        printf ("%s", temp);
+        for(int h=strlen(temp);h<indent;h++)printf(" ");
     }
     printf ("\n");
 
     // Stampo i valori selezionati
     for ( int i = 0; i < tuple ; i ++) {
-    for ( int j = 0; j < campi ; j ++) {
-    printf ("%s\t\t", PQgetvalue ( res , i , j)) ;
+        for ( int j = 0; j < campi ; j ++) {
+            char * temp=PQgetvalue ( res , i , j);
+            printf ("%s", temp);
+            for(int h=strlen(temp);h<indent;h++)printf(" ");
+
     }
     printf ("\n");
     }
+    PQclear(res);
 }
