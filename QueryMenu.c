@@ -87,6 +87,36 @@ bool Query5(){
 
 int main(){
 
+  printf("Query menu:\n");
+  printf("1- Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore \n");
+  printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno \n");
+  printf("3- Contare la visite guidate che includono nell’itinerario una determinata opera \n");
+  printf("4- Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento \n");
+  printf("5- Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area\n");
+
+  printf("Digita il numero della query da eseguire:\n");
+  int num;
+  scanf("%d",&num);
+
+  if(num == 1){
+    Query1();
+  }
+  if(num == 2){
+    Query2();
+  }
+  if(num == 3){
+    Query3();
+  }
+  if(num == 4){
+    Query4();
+  }
+  if(num == 5){
+    Query5();
+  }
+
+
+
+
 
 
   return 0;
