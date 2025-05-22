@@ -1,3 +1,5 @@
+DROP VIEW  IF EXISTS Visita_Guidata_Estesa;
+
 DROP TABLE  IF EXISTS Creazione;
 DROP TABLE  IF EXISTS Ingresso_Libero;
 DROP TABLE  IF EXISTS Ingresso_Guidato;
@@ -271,3 +273,11 @@ INSERT INTO Creazione (Codice, Nome, Cognome) VALUES
 ('A005', 'Pablo', 'Picasso'),
 ('A006', 'Frida', 'Kahlo'),
 ('A007', 'Claude', 'Monet');
+
+
+
+CREATE VIEW   Visita_Guidata_Estesa as (
+SELECT ID, VG.Area, VG.Inizio, Guida, Data_Visita, Turno, Partecipanti, Nome, Fine, Argomento
+FROM Visita_Guidata VG JOIN Esposizione E ON (VG.Area = E.Area AND VG.Inizio = E.Inizio) 
+
+);
