@@ -32,7 +32,7 @@ else {
 
     PGresult * res ;
     res = PQexec ( conn , " SELECT * FROM Artefatto ") ;
-
+    printResults(res, conn);
 /*
     checkResults(res,conn);
     printResults(res, conn);
