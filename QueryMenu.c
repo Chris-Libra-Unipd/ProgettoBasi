@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "path/to/libpq-fe.h" //file .h che si trova in PostgreSQL/17/unclude
-
+#include <string.h>
+#include "include/libpq-fe.h" 
 bool Query1(){
   /*
   Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore.
   Parametri: n = numero artefatti, a = nome autore, c = cognome autore
   */
   int numero;
-  std::string nome;
-  std::string cognome;
+  char* nome;
+  char* cognome;
 
   printf("Inserire i parametri della query\n:");
   scanf("Numero minimo di artefatti: %d",&numero);
@@ -26,7 +26,7 @@ bool Query2(){
   Parametri: arg = argomento
   */
 
-  std::string argomento;
+  char* argomento;
 
   printf("Inserire i parametri della query\n:");
   //argomento va scelto dal db
@@ -57,7 +57,7 @@ bool Query4(){
 
   */
 
-  std::string argomento;
+  char* argomento;
 
   printf("Inserire i parametri della query\n:");
   //argomento va scelto dal db
@@ -73,8 +73,8 @@ bool Query5(){
 
   */
 
-  std::string nome;
-  std::string cognome;
+  char* nome;
+  char* cognome;
 
   printf("Inserire i parametri della query\n:");
   //nome e cognome autori vanno scelti dal db
@@ -86,7 +86,9 @@ bool Query5(){
 
 
 int main(){
-
+  PGconn * conn ;
+  conn = PQconnectdb ("") ;
+  PQfinish ( conn );
   printf("Query menu:\n");
   printf("1- Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore \n");
   printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno \n");
