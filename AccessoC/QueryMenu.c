@@ -14,8 +14,6 @@
 #define PG_PASS  "myPostGres"// la vostra password
 #define PG_PORT 5432
 
-//ATTENZIONE WINDOWS: creare la cartella dependencies con incluse libpq.dll e libpq.lib nella stessa cartella del file .c, usare il makefile
-
 void do_exit(PGconn *conn){
   PQfinish(conn);
   exit(1);
@@ -66,24 +64,11 @@ void printResults ( PGresult * res, const PGconn * conn ){
 
 //---------------------------------
 
-bool Query1(){
+bool Query1(PGconn *conn){
   /*
   Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore.
   Parametri: n = numero artefatti, a = nome autore, c = cognome autore
   */
-
-
-  char conninfo [250];
-  //sprintf ( conninfo , "user=%s password=%s dbname=%s hostaddr=%s port=%d",PG_USER , PG_PASS , PG_DB , PG_HOST , PG_PORT ) ;
-  //host e porta non li ricordo, ma tanto non sono obbligatori
-  sprintf ( conninfo , "user=%s password=%s dbname=%s",PG_USER , PG_PASS , PG_DB) ;
-  PGconn *conn = PQconnectdb(conninfo); //Connessione al database
-  if (PQstatus(conn) == CONNECTION_BAD) //Se non è possibile connettersi
-  {
-    fprintf(stderr, "Connection to database failed: %s", PQerrorMessage(conn));
-    do_exit(conn);
-  }
-
   int numero;
   char* nome;
   char* cognome;
@@ -125,14 +110,14 @@ bool Query1(){
   printResults(res,conn);
  
   //libera memoria e chiudi connessione
-  PQclear(ncArtisti); 
+  PQclear(ncArtisti);  
   PQfinish(conn);
   return 1;
 }
 
 //---------------------------------
 
-bool Query2(){
+bool Query2(PGconn *conn){
   /*
   Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno
   Parametri: arg = argomento
@@ -140,8 +125,40 @@ bool Query2(){
 
   char* argomento;
 
-  printf("Inserire i parametri della query\n:");
-  //argomento va scelto dal db
+  printf("Inserire i parametri della query\n");
+
+  //recupero argomenti disponibili dal db
+  PGresult *dbArgs = PQexec(conn, "SELECT * FROM argomento");
+  checkResults(dbArgs,conn);
+
+  //selezione dalla lista di argomenti recuperati
+  printf("Seleziona uno dei seguenti argomenti\n");
+  for(int i = 0; i < PQntuples(dbArgs);i++){
+      printf("%d - %s\n",i,PQgetvalue(dbArgs,i,0));
+  }
+  int scelta = 0;
+  scanf("%d",&scelta);
+
+  argomento = PQgetvalue(dbArgs,scelta,0);
+
+  printf("Hai scelto l'argomento %s:\n" ,argomento);
+
+  //costruzione query parametrica
+  char query[500];
+  char argStr[32];
+  strcpy(argStr, argomento);
+
+  sprintf(query, "SELECT IG.Data_Acq, COUNT(*) FROM (Ingresso_Guidato  join Biglietto On Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = \'%s\' GROUP BY IG.Data_Acq",argStr);
+
+  //Esecuzione query
+  PGresult *res = PQexec(conn, query);
+
+  printResults(res,conn);
+ 
+  //libera memoria e chiudi connessione
+  PQclear(dbArgs); 
+  PQfinish(conn);
+  return 1;
 
 }
 
@@ -210,11 +227,24 @@ int main(){
   int num;
   scanf("%d",&num);
 
+  PGconn *conn;
+  char conninfo [250];
+  //sprintf ( conninfo , "user=%s password=%s dbname=%s hostaddr=%s port=%d",PG_USER , PG_PASS , PG_DB , PG_HOST , PG_PORT ) ;
+  //host e porta non li ricordo, ma tanto non sono obbligatori
+  sprintf ( conninfo , "user=%s password=%s dbname=%s",PG_USER , PG_PASS , PG_DB) ;
+  conn = PQconnectdb(conninfo); //Connessione al database
+  if (PQstatus(conn) == CONNECTION_BAD) //Se non è possibile connettersi
+  {
+    fprintf(stderr, "Connection to database failed: %s", PQerrorMessage(conn));
+    do_exit(conn);
+  }
+
+
   if(num == 1){
-    Query1();
+    Query1(conn);
   }
   if(num == 2){
-    Query2();
+    Query2(conn);
   }
   if(num == 3){
     Query3();
