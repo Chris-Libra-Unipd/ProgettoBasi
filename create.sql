@@ -112,7 +112,7 @@ CREATE TABLE Visita_Guidata(
     Area VARCHAR(32) NOT NULL,
     Inizio DATE NOT NULL,
     Guida CHAR(32) NOT NULL,
-    Data_Visita DATE NOT NULL,
+    Data_Visita DATE NOT NULL CHECK(Data_Visita>=Inizio),
     Turno Turni_Giornata NOT NULL,
     Partecipanti INT NOT NULL CHECK (Partecipanti>=0),
     CONSTRAINT unique_visits UNIQUE (Area, Inizio, Data_Visita, Turno, Guida),
