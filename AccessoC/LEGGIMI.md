@@ -4,3 +4,5 @@ PostgreSQL/17/lib
 
 
 È poi necessario inserire le informazioni relative al proprio db nelle define
+
+IL file diventa lungo, conviene dividerlo e fare un file per query?
