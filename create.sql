@@ -170,6 +170,8 @@ CREATE TABLE Creazione(
 
 );
 
+--Popolamento
+
 INSERT INTO Artista (Nome, Cognome, DN, DM) VALUES
 ('Leonardo', 'da Vinci', '1452-04-15', '1519-05-02'),
 ('Michelangelo', 'Buonarroti', '1475-03-06', '1564-02-18'),
@@ -320,10 +322,47 @@ INSERT INTO Creazione (Codice, Nome, Cognome) VALUES
 ('A006', 'Frida', 'Kahlo'),
 ('A007', 'Claude', 'Monet');
 
+-- Query
+-- query 1
+SELECT A.Area, A.Inizio, COUNT(*)
+FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A
+WHERE C.Codice = A.Codice  AND C.Nome = 'Leonardo' AND C.Cognome ='da Vinci'
+GROUP BY A.Area, A.Inizio
+HAVING COUNT(*) >= 1
+
+--query 2
+SELECT COUNT(*)
+FROM I_Guidato IG, Visita_Guidata VG, Esposizione E
+WHERE VG.Area = E.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = 'Rinascimento'
+GROUP BY IG.Data_Acq
+
+--query 3
+SELECT AVG(A.Partecipanti), COUNT(*)
+FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A
+WHERE A.Data_visita >= '2020-01-10' AND A.Argomento = 'Rinascimento'
+
+--query 4
+SELECT CF, NumVisite
+FROM (
+    SELECT VG.Guida AS CF, COUNT(*) AS NumVisite
+    FROM Visita_Guidata_Estesa VG
+    WHERE Argomento = 'Rinascimento'
+    GROUP BY VG.Guida
+) AS A
+ORDER BY NumVisite DESC
+LIMIT 1;
+
+--
+--query 5
+SELECT AVG(Num)
+FROM	(SELECT COUNT(*) AS Num
+FROM Creazione C, Artefatto A
+WHERE A.Codice = C.Codice AND C.Nome = 'Leonardo' AND C.Cognome = 'da Vinci' 
+GROUP BY A.Esposizione)
 
 
-CREATE VIEW   Visita_Guidata_Estesa as (
-SELECT ID, VG.Area, VG.Inizio, Guida, Data_Visita, Turno, Partecipanti, Nome, Fine, Argomento
-FROM Visita_Guidata VG JOIN Esposizione E ON (VG.Area = E.Area AND VG.Inizio = E.Inizio) 
 
-);
+-- Inidci
+
+
+CREATE INDEX index_visits ON Visita_Guidata ( Data_Visita );
