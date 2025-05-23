@@ -31,6 +31,44 @@ void checkResults ( PGresult * res , const PGconn * conn ) {
 
 //---------------------------------
 
+void sceltaArgomento(char** argomento, PGconn * conn ){  
+  //recupero argomenti disponibili dal db
+  PGresult *dbArgs = PQexec(conn, "SELECT * FROM argomento");
+  checkResults(dbArgs,conn);
+
+  //selezione dalla lista di argomenti recuperati
+  printf("Seleziona uno dei seguenti argomenti\n");
+  for(int i = 0; i < PQntuples(dbArgs);i++){
+      printf("%d - %s\n",i,PQgetvalue(dbArgs,i,0));
+  }
+  int scelta = 0;
+  scanf("%d",&scelta);
+
+  *argomento = PQgetvalue(dbArgs,scelta,0);
+  PQclear(dbArgs);
+}
+
+//---------------------------------
+
+void sceltaArtista(char** nome, char** cognome, PGconn * conn){//double pointer necessario, single pointer non funziona!
+   //recupero artisti disponibili dal db
+  PGresult *ncArtisti = PQexec(conn, "SELECT nome,cognome FROM artista");
+  checkResults(ncArtisti,conn);
+
+  //selezione dalla lista di artisti recuperati
+  printf("Seleziona uno dei seguenti artisti\n");
+  for(int i = 0; i < PQntuples(ncArtisti);i++){
+      printf("%d - %s %s\n",i,PQgetvalue(ncArtisti,i,0),PQgetvalue(ncArtisti,i,1));
+  }
+  int scelta = 0;
+  scanf("%d",&scelta);
+
+  *nome = PQgetvalue(ncArtisti,scelta,0);
+  *cognome = PQgetvalue(ncArtisti,scelta,1);
+  PQclear(ncArtisti);  
+}
+//---------------------------------
+
 void printResults ( PGresult * res, const PGconn * conn ){
     checkResults(res,conn);
     int indent=32;
@@ -77,21 +115,7 @@ bool Query1(PGconn *conn){
   printf("Numero minimo di artefatti: ");
   scanf("%d",&numero);
 
-  //recupero artisti disponibili dal db
-  PGresult *ncArtisti = PQexec(conn, "SELECT nome,cognome FROM artista");
-  checkResults(ncArtisti,conn);
-
-  //selezione dalla lista di artisti recuperati
-  printf("Seleziona uno dei seguenti artisti\n");
-  for(int i = 0; i < PQntuples(ncArtisti);i++){
-      printf("%d - %s %s\n",i,PQgetvalue(ncArtisti,i,0),PQgetvalue(ncArtisti,i,1));
-  }
-  int scelta = 0;
-  scanf("%d",&scelta);
-
-  nome = PQgetvalue(ncArtisti,scelta,0);
-  cognome = PQgetvalue(ncArtisti,scelta,1);
-
+  sceltaArtista(&nome,&cognome,conn);
   printf("Hai scelto %s %s con almeno %d opere\n",nome,cognome,numero);
 
 
@@ -110,7 +134,7 @@ bool Query1(PGconn *conn){
   printResults(res,conn);
  
   //libera memoria e chiudi connessione
-  PQclear(ncArtisti);  
+  
   PQfinish(conn);
   return 1;
 }
@@ -122,25 +146,9 @@ bool Query2(PGconn *conn){
   Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno
   Parametri: arg = argomento
   */
-
-  char* argomento;
-
-  printf("Inserire i parametri della query\n");
-
-  //recupero argomenti disponibili dal db
-  PGresult *dbArgs = PQexec(conn, "SELECT * FROM argomento");
-  checkResults(dbArgs,conn);
-
-  //selezione dalla lista di argomenti recuperati
-  printf("Seleziona uno dei seguenti argomenti\n");
-  for(int i = 0; i < PQntuples(dbArgs);i++){
-      printf("%d - %s\n",i,PQgetvalue(dbArgs,i,0));
-  }
-  int scelta = 0;
-  scanf("%d",&scelta);
-
-  argomento = PQgetvalue(dbArgs,scelta,0);
-
+ printf("Inserire i parametri della query\n");
+  char * argomento;
+  sceltaArgomento(&argomento,conn);
   printf("Hai scelto l'argomento %s:\n" ,argomento);
 
   //costruzione query parametrica
@@ -154,9 +162,7 @@ bool Query2(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
- 
-  //libera memoria e chiudi connessione
-  PQclear(dbArgs); 
+
   PQfinish(conn);
   return 1;
 
@@ -164,38 +170,70 @@ bool Query2(PGconn *conn){
 
 //---------------------------------
 
-bool Query3(){
+bool Query3(PGconn *conn){
   /*
-  Contare la visite guidate che includono nell’itinerario una determinata opera
-  Parametri: c = codice opera
-
+  Contare il numero di visite guidate che hanno trattato un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti
+  Parametri: Argomento arg, Data d
   */
+  printf("Inserire i parametri della query\n");
+  char data[12];
+  printf("Inserire la data nel formato AAAA-MM-GG:\n");
+  scanf("%s",&data);
 
-  int codice;
-  printf("Inserire i parametri della query\n:");
-  //codice va scelto dal db
+  char * argomento;
+  sceltaArgomento(&argomento,conn);
+  printf("Hai scelto l'argomento %s:\n" ,argomento);
+
+  //costruzione query parametrica
+  char query[500];
+  char argStr[32];
+  strcpy(argStr, argomento);
+
+  sprintf(query, "SELECT AVG(A.Partecipanti), COUNT(*) FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A WHERE A.Data_visita >=\'%s\' AND A.Argomento =\'%s\'",data,argStr);
+
+  //Esecuzione query
+  PGresult *res = PQexec(conn, query);
+
+  printResults(res,conn);
+  
+  PQfinish(conn);
+  return 1;
 
 }
 
 //---------------------------------
 
-bool Query4(){
+bool Query4(PGconn *conn){
   /*
   Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento
   Parametri: a = argomento
 
   */
+  printf("Inserire i parametri della query\n");
+  char * argomento;
+  sceltaArgomento(&argomento,conn);
+  printf("Hai scelto l'argomento %s:\n" ,argomento);
 
-  char* argomento;
+  //costruzione query parametrica
+  char query[500];
+  char argStr[32];
+  strcpy(argStr, argomento);
 
-  printf("Inserire i parametri della query\n:");
-  //argomento va scelto dal db
+  sprintf(query, "SELECT CF, NumVisite FROM (SELECT VG.Guida AS CF, COUNT(*) AS NumVisite FROM Visita_Guidata_Estesa VG WHERE Argomento = \'%s\' GROUP BY VG.Guida ) AS A ORDER BY NumVisite DESC LIMIT 1; ",argStr);
+
+  //Esecuzione query
+  PGresult *res = PQexec(conn, query);
+
+  printResults(res,conn);
+  
+  PQfinish(conn);
+  return 1;
 
 }
 
 //---------------------------------
 
-bool Query5(){
+bool Query5(PGconn *conn){
   /*
   Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area
   Parametri: Nome n, Cognome c
@@ -205,8 +243,27 @@ bool Query5(){
   char* nome;
   char* cognome;
 
-  printf("Inserire i parametri della query\n:");
-  //nome e cognome autori vanno scelti dal db
+  printf("Inserire i parametri della query\n");
+
+  sceltaArtista(&nome,&cognome,conn);
+  printf("Hai scelto l\'artista: %s %s\n",nome,cognome);
+
+  //costruzione query parametrica
+  char query[500];
+  char nomeArtista[32];
+  char cognomeArtista[32];
+  strcpy(nomeArtista,nome);
+  strcpy(cognomeArtista,cognome);
+
+  sprintf(query, "SELECT AVG(Num) FROM	(SELECT COUNT(*) AS Num FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A WHERE A.Codice = C.Codice AND C.Nome = \'%s\' AND C.Cognome = \'%s\'  GROUP BY A.Area) ",nome, cognomeArtista);
+
+  //Esecuzione query
+  PGresult *res = PQexec(conn, query);
+
+  printResults(res,conn);
+ 
+  PQfinish(conn);
+  return 1;
 
 }
 
@@ -216,16 +273,7 @@ bool Query5(){
 
 int main(){
 
-  printf("Query menu:\n");
-  printf("1- Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore \n");
-  printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno \n");
-  printf("3- Contare la visite guidate che includono nell’itinerario una determinata opera \n");
-  printf("4- Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento \n");
-  printf("5- Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area\n");
-
-  printf("Digita il numero della query da eseguire:\n");
-  int num;
-  scanf("%d",&num);
+  int num = -1;
 
   PGconn *conn;
   char conninfo [250];
@@ -238,29 +286,39 @@ int main(){
     fprintf(stderr, "Connection to database failed: %s", PQerrorMessage(conn));
     do_exit(conn);
   }
+  
+  while(num != 9){
+    printf("Query menu:\n");
+    printf("1- Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore \n");
+    printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno \n");
+    printf("3- Contare la visite guidate che includono nell\'itinerario una determinata opera \n");
+    printf("4- Trovare il Codice Fiscale della guida che ha tenuto piu\' visite guidate su un certo argomento \n");
+    printf("5- Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area\n");
+    printf("9- Esci\n");
 
+    printf("Digita il numero della query da eseguire:\n");  
+    scanf("%d",&num);
 
-  if(num == 1){
-    Query1(conn);
-  }
-  if(num == 2){
-    Query2(conn);
-  }
-  if(num == 3){
-    Query3();
-  }
-  if(num == 4){
-    Query4();
-  }
-  if(num == 5){
-    Query5();
-  }
-
-
+    if(num == 1){
+      Query1(conn);
+    }
+    else if(num == 2){
+      Query2(conn);
+    }
+    else if(num == 3){
+      Query3(conn);
+    }
+    else if(num == 4){
+      Query4(conn);
+    }
+    else if(num == 5){
+      Query5(conn);
+    }
     
-
-
-
+    for(int i = 0; i < 100; i++)
+      printf("-");
+    printf("\n\n");
+  }
 
   return 0;
 }
