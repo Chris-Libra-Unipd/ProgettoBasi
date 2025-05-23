@@ -98,7 +98,7 @@ CREATE TABLE Appartenenza(
     Artefatto CHAR(4) NOT NULL,
     PRIMARY KEY(Area, Inizio, Artefatto),
 
-    FOREIGN KEY (Area,Inizio) REFERENCES Passata(Area,Inizio)
+    FOREIGN KEY (Area,Inizio) REFERENCES Esposizione(Area,Inizio)
         ON DELETE NO ACTION
         ON UPDATE CASCADE,
     FOREIGN KEY (Artefatto) REFERENCES Artefatto(Codice)
@@ -196,7 +196,7 @@ INSERT INTO Guida (CF, Specializzazione) VALUES
 INSERT INTO Esposizione (Area, Nome, Inizio, Fine, Argomento) VALUES
 ('Area1', 'Maestri Rinascimentali', '2023-01-15', '2023-06-15', 'Rinascimento'),
 ('Area2', 'Luce e Colore', '2023-02-01', '2023-07-31', 'Impressionismo'),
-('Area3', 'Forme Spezzate', '2023-03-10', '2023-08-20', 'Cubismo'),
+('Area3', 'Forme Spezzate', '2023-03-10', '2024-08-20', 'Cubismo'),
 ('Area1', 'Modernità in Mostra', '2023-09-01', '2024-01-31', 'Arte Moderna'),
 ('Area2', 'Contemporanei a Confronto', '2023-10-15', '2024-03-15', 'Arte Contemporanea');
 
@@ -214,13 +214,13 @@ INSERT INTO Artefatto (Codice, Nome, Tipologia) VALUES
 -- Esposizioni passate
 INSERT INTO Passata (Area, Inizio) VALUES
 ('Area1', '2023-01-15'),
-('Area2', '2023-02-01'),
-('Area3', '2023-03-10');
+('Area2', '2023-02-01');
 
 -- Esposizioni in corso
 INSERT INTO In_Corso (Area, Inizio, Curatore) VALUES
 ('Area1', '2023-09-01', 'PLTFRN60D12H501Z'),
-('Area2', '2023-10-15', 'RSSGPP82E30H501W');
+('Area2', '2023-10-15', 'RSSGPP82E30H501W'),
+('Area3', '2023-03-10','BNCLSN90A41H501X');
 
 INSERT INTO Appartenenza (Area, Inizio, Artefatto) VALUES
 ('Area1', '2023-01-15', 'A001'),
@@ -233,11 +233,27 @@ INSERT INTO Appartenenza (Area, Inizio, Artefatto) VALUES
 
 
 INSERT INTO Visita_Guidata (ID, Area, Inizio, Guida, Data_Visita, Turno, Partecipanti) VALUES
-(1, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Mattina', 15),
-(2, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Pomeriggio', 12),
-(3, 'Area2', '2023-02-01', 'BNCLSN90A41H501X', '2023-03-05', 'Mattina', 20),
-(4, 'Area3', '2023-03-10', 'VRDGNN75P55H501Y', '2023-04-15', 'Pomeriggio', 18),
-(5, 'Area1', '2023-09-01', 'PLTFRN60D12H501Z', '2023-10-10', 'Mattina', 10);
+(1, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Mattina', 2),
+(2, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-10', 'Pomeriggio', 0),
+(3, 'Area2', '2023-02-01', 'BNCLSN90A41H501X', '2023-03-05', 'Mattina', 1),
+(4, 'Area3', '2023-03-10', 'VRDGNN75P55H501Y', '2023-04-15', 'Pomeriggio', 1),
+(5, 'Area1', '2023-09-01', 'PLTFRN60D12H501Z', '2023-10-10', 'Mattina', 1),
+(6, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-24', 'Mattina', 2),
+(7, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-02-24', 'Pomeriggio', 1),
+(8, 'Area2', '2023-02-01', 'BNCLSN90A41H501X', '2023-03-29', 'Mattina', 1),
+(9, 'Area3', '2023-03-10', 'VRDGNN75P55H501Y', '2023-04-29', 'Pomeriggio', 1),
+(10, 'Area1', '2023-09-01', 'PLTFRN60D12H501Z', '2023-10-24', 'Mattina', 1),
+(11, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-03-10', 'Mattina', 1),
+(12, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-03-10', 'Pomeriggio', 1),
+(13, 'Area2', '2023-02-01', 'BNCLSN90A41H501X', '2023-04-05', 'Mattina', 1),
+(14, 'Area3', '2023-03-10', 'VRDGNN75P55H501Y', '2023-05-15', 'Pomeriggio', 1),
+(15, 'Area1', '2023-09-01', 'PLTFRN60D12H501Z', '2023-11-10', 'Mattina', 1),
+(16, 'Area1', '2023-09-01', 'PLTFRN60D12H501Z', '2023-12-01', 'Mattina', 1),
+(17, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-04-10', 'Mattina', 1),
+(18, 'Area1', '2023-01-15', 'RSSMRA85M10H501R', '2023-05-10', 'Pomeriggio', 2),
+(19, 'Area2', '2023-02-01', 'BNCLSN90A41H501X', '2023-06-05', 'Mattina',0),
+(20, 'Area3', '2023-03-10', 'VRDGNN75P55H501Y', '2023-07-15', 'Pomeriggio',0),
+(21, 'Area1', '2023-09-01', 'PLTFRN60D12H501Z', '2023-12-10', 'Mattina',0);
 
 
 INSERT INTO Biglietto (ID, Data_Acq, EMail) VALUES
@@ -247,7 +263,22 @@ INSERT INTO Biglietto (ID, Data_Acq, EMail) VALUES
 (4, '2023-04-10', 'paolo.neri@email.com'),
 (5, '2023-10-05', 'laura.gialli@email.com'),
 (6, '2023-10-05', 'giovanni.blu@email.com'),
-(7, '2023-10-06', 'maria.rosa@email.com');
+(7, '2023-10-06', 'maria.rosa@email.com'),
+(8, '2023-10-06', 'maria.biachi@email.com'),
+(9, '2023-10-06', 'paolo.neri@email.com'),
+(10, '2023-10-06', 'maria.rosa@email.com'),
+(11, '2023-10-06', 'maria.rosa@email.com'),
+(12, '2023-10-06', 'maria.rosa@email.com'),
+(13, '2023-10-06', 'maria.rosa@email.com'),
+(14, '2023-10-06', 'paolo.neri@email.com'),
+(15, '2023-10-06', 'maria.rosa@email.com'),
+(16, '2023-10-06', 'laura.gialli@email.com'),
+(17, '2023-10-06', 'maria.rosa@email.com'),
+(18, '2023-10-06', 'maria.rosa@email.com'),
+(19, '2023-10-06', 'maria.rosa@email.com'),
+(20, '2023-10-06', 'paolo.neri@email.com'),
+(21, '2023-10-06', 'laura.gialli@email.com'),
+(22, '2023-10-06', 'maria.rosa@email.com');
 
 
 -- Ingressi guidati
@@ -256,7 +287,22 @@ INSERT INTO Ingresso_Guidato (ID, IDvg) VALUES
 (2, 1),
 (3, 3),
 (4, 4),
-(5, 5);
+(5, 5),
+(8, 6),
+(9, 6),
+(10, 7),
+(11, 8),
+(12, 9),
+(13, 10),
+(14, 11),
+(15, 13),
+(16, 12),
+(17, 14),
+(18, 15),
+(19, 16),
+(20, 17),
+(21, 18),
+(22, 18);
 
 -- Ingressi liberi
 INSERT INTO Ingresso_Libero (ID, Data_Validita) VALUES
