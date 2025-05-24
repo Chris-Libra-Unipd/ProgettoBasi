@@ -4,11 +4,7 @@
 #include <string.h>
 #include "dependencies/include/libpq-fe.h"
 
-#define DBNAME "primo"
-#define PSW "12340"
-#define USR "postgres"
-
-#define PG_HOST "127.0.0.1" // oppure " localhost " o " postgresql "
+#define PG_HOST " localhost " // oppure " localhost " o " postgresql "
 #define PG_USER "postgres" // il vostro nome utente
 #define PG_DB "primo"// il nome del database
 #define PG_PASS  "12340"// la vostra password
@@ -104,8 +100,7 @@ void printResults ( PGresult * res, const PGconn * conn ){
 
 bool Query1(PGconn *conn){
   /*
-  Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore.
-  Parametri: n = numero artefatti, a = nome autore, c = cognome autore
+  Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti. 
   */
   int numero;
   char* nome;
@@ -133,7 +128,7 @@ bool Query1(PGconn *conn){
 
   //printResults, libera anche res
   printResults(res,conn);
-  
+ 
   return 1;
 }
 
@@ -141,8 +136,7 @@ bool Query1(PGconn *conn){
 
 bool Query2(PGconn *conn){
   /*
-  Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno
-  Parametri: arg = argomento
+  Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti indicando anche la data di acquisto.
   */
  printf("Inserire i parametri della query\n");
   char * argomento;
@@ -160,7 +154,6 @@ bool Query2(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
-
   return 1;
 
 }
@@ -169,8 +162,7 @@ bool Query2(PGconn *conn){
 
 bool Query3(PGconn *conn){
   /*
-  Contare il numero di visite guidate che hanno trattato un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti
-  Parametri: Argomento arg, Data d
+  Contare il numero di visite guidate che hanno tenuto visite guidate in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti
   */
   printf("Inserire i parametri della query\n");
   char data[12];
@@ -201,9 +193,7 @@ bool Query3(PGconn *conn){
 
 bool Query4(PGconn *conn){
   /*
-  Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento
-  Parametri: a = argomento
-
+  Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento, indicare anche il numero di visite.
   */
   printf("Inserire i parametri della query\n");
   char * argomento;
@@ -221,7 +211,6 @@ bool Query4(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
-  
   return 1;
 
 }
@@ -230,9 +219,7 @@ bool Query4(PGconn *conn){
 
 bool Query5(PGconn *conn){
   /*
-  Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area
-  Parametri: Nome n, Cognome c
-
+  Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area.
   */
 
   char* nome;
@@ -256,7 +243,6 @@ bool Query5(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
- 
 
   return 1;
 
@@ -285,11 +271,11 @@ int main(){
   
   while(num != 9){
     printf("Query menu:\n");
-    printf("1- Trovare i nomi delle esposizioni che hanno o hanno avuto almeno un certo numero di artefatti esposti appartenenti a un determinato autore \n");
-    printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti ogni giorno \n");
-    printf("3- Contare la visite guidate che includono nell\'itinerario una determinata opera \n");
-    printf("4- Trovare il Codice Fiscale della guida che ha tenuto piu\' visite guidate su un certo argomento \n");
-    printf("5- Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area\n");
+    printf("1- Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti.  \n");
+    printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti indicando anche la data di acquisto.\n");
+    printf("3- Contare il numero di visite guidate che hanno tenuto visite guidate in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti \n");
+    printf("4- Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento, indicare anche il numero di visite.\n");
+    printf("5- Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area.\n");
     printf("9- Esci\n");
 
     printf("Digita il numero della query da eseguire:\n");  
@@ -315,6 +301,8 @@ int main(){
       printf("-");
     printf("\n\n");
   }
+
   PQfinish(conn);
+
   return 0;
 }
