@@ -41,6 +41,7 @@
         "ostream": "c",
         "stdexcept": "c",
         "streambuf": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "libpq-fe.h": "c"
     }
 }

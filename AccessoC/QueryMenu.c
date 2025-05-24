@@ -4,14 +4,14 @@
 #include <string.h>
 #include "dependencies/include/libpq-fe.h"
 
-#define DBNAME "sampleDB"
-#define PSW "myPostGres"
+#define DBNAME "primo"
+#define PSW "12340"
 #define USR "postgres"
 
-#define PG_HOST " localhost " // oppure " localhost " o " postgresql "
+#define PG_HOST "127.0.0.1" // oppure " localhost " o " postgresql "
 #define PG_USER "postgres" // il vostro nome utente
-#define PG_DB "sampleDB"// il nome del database
-#define PG_PASS  "myPostGres"// la vostra password
+#define PG_DB "primo"// il nome del database
+#define PG_PASS  "12340"// la vostra password
 #define PG_PORT 5432
 
 void do_exit(PGconn *conn){
@@ -131,11 +131,9 @@ bool Query1(PGconn *conn){
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
 
+  //printResults, libera anche res
   printResults(res,conn);
- 
-  //libera memoria e chiudi connessione
   
-  PQfinish(conn);
   return 1;
 }
 
@@ -163,7 +161,6 @@ bool Query2(PGconn *conn){
 
   printResults(res,conn);
 
-  PQfinish(conn);
   return 1;
 
 }
@@ -196,7 +193,6 @@ bool Query3(PGconn *conn){
 
   printResults(res,conn);
   
-  PQfinish(conn);
   return 1;
 
 }
@@ -226,7 +222,6 @@ bool Query4(PGconn *conn){
 
   printResults(res,conn);
   
-  PQfinish(conn);
   return 1;
 
 }
@@ -262,7 +257,7 @@ bool Query5(PGconn *conn){
 
   printResults(res,conn);
  
-  PQfinish(conn);
+
   return 1;
 
 }
@@ -279,7 +274,8 @@ int main(){
   char conninfo [250];
   //sprintf ( conninfo , "user=%s password=%s dbname=%s hostaddr=%s port=%d",PG_USER , PG_PASS , PG_DB , PG_HOST , PG_PORT ) ;
   //host e porta non li ricordo, ma tanto non sono obbligatori
-  sprintf ( conninfo , "user=%s password=%s dbname=%s",PG_USER , PG_PASS , PG_DB) ;
+//  sprintf ( conninfo , "user=%s password=%s dbname=%s",PG_USER , PG_PASS , PG_DB) ;
+  sprintf ( conninfo , "user=%s password=%s dbname=%s hostaddr=%s port=%d",PG_USER , PG_PASS , PG_DB , PG_HOST , PG_PORT ) ;
   conn = PQconnectdb(conninfo); //Connessione al database
   if (PQstatus(conn) == CONNECTION_BAD) //Se non è possibile connettersi
   {
@@ -319,6 +315,6 @@ int main(){
       printf("-");
     printf("\n\n");
   }
-
+  PQfinish(conn);
   return 0;
 }

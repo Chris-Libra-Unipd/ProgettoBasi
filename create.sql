@@ -48,11 +48,18 @@ CREATE TABLE Guida(
     FOREIGN KEY (Specializzazione) REFERENCES Argomento (Nome)
 );
 
+CREATE TABLE Artefatto(
+    Codice CHAR(4) PRIMARY KEY,
+    Nome VARCHAR(32) NOT NULL, 
+    Tipologia Tipo NOT NULL
+);
+
+
 CREATE TABLE Esposizione(
+    Nome VARCHAR(32) NOT NULL,
     Area VARCHAR(32) NOT NULL,
     Inizio DATE NOT NULL,
     Fine DATE NOT NULL CHECK(Inizio <Fine),
-    Nome VARCHAR(32) NOT NULL,
     Argomento VARCHAR(32) NOT NULL,
     PRIMARY KEY(Area,Inizio),
 
@@ -63,11 +70,6 @@ CREATE TABLE Esposizione(
 
 
 
-CREATE TABLE Artefatto(
-    Codice CHAR(4) PRIMARY KEY,
-    Nome VARCHAR(32) NOT NULL, 
-    Tipologia Tipo NOT NULL
-);
 
 CREATE TABLE In_Corso(
     Area VARCHAR(32) NULL,
@@ -115,7 +117,7 @@ CREATE TABLE Visita_Guidata(
     Data_Visita DATE NOT NULL CHECK(Data_Visita>=Inizio),
     Turno Turni_Giornata NOT NULL,
     Partecipanti INT NOT NULL CHECK (Partecipanti>=0),
-    CONSTRAINT unique_visits UNIQUE (Area, Inizio, Data_Visita, Turno, Guida),
+    CONSTRAINT unique_visits UNIQUE (Data_Visita, Turno, Guida),
 
     FOREIGN KEY (Guida) REFERENCES Guida(CF)
         ON DELETE NO ACTION
@@ -322,43 +324,56 @@ INSERT INTO Creazione (Codice, Nome, Cognome) VALUES
 ('A006', 'Frida', 'Kahlo'),
 ('A007', 'Claude', 'Monet');
 
+
+--View
+CREATE VIEW Visita_Guidata_Estesa AS (
+SELECT ID, Area, Inizio, Fine, Guida, Data_Visita, Turno, Partecipanti, Nome, Argomento
+FROM Esposizione E JOIN Visita_Guidata V ON (E.area=V.Area AND E.Inizio=V.Inizio)
+);
+
+
+
+
 -- Query
 -- query 1
-SELECT A.Area, A.Inizio, COUNT(*)
+SELECT A.Area, A.Inizio, COUNT(*) AS num_esposizioni
 FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A
-WHERE C.Codice = A.Codice  AND C.Nome = 'Leonardo' AND C.Cognome ='da Vinci'
+WHERE C.Codice = A.Codice  AND C.Nome = nom AND C.Cognome = cogn
 GROUP BY A.Area, A.Inizio
-HAVING COUNT(*) >= 1
+HAVING COUNT(*) >= min
+
 
 --query 2
-SELECT COUNT(*)
-FROM I_Guidato IG, Visita_Guidata VG, Esposizione E
-WHERE VG.Area = E.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = 'Rinascimento'
+SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti
+FROM (Ingresso_Guidato  join Biglietto On Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E
+WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = arg
 GROUP BY IG.Data_Acq
 
 --query 3
-SELECT AVG(A.Partecipanti), COUNT(*)
+SELECT AVG(A.Partecipanti) AS partecipanti_medi, COUNT(*) AS num_visite
 FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A
-WHERE A.Data_visita >= '2020-01-10' AND A.Argomento = 'Rinascimento'
+WHERE A.Data_visita >= dt AND A.Argomento = arg
+
 
 --query 4
 SELECT CF, NumVisite
 FROM (
     SELECT VG.Guida AS CF, COUNT(*) AS NumVisite
     FROM Visita_Guidata_Estesa VG
-    WHERE Argomento = 'Rinascimento'
+    WHERE Argomento = arg
     GROUP BY VG.Guida
 ) AS A
 ORDER BY NumVisite DESC
 LIMIT 1;
 
+
 --
 --query 5
-SELECT AVG(Num)
+SELECT AVG(Num) AS media_artefatti
 FROM	(SELECT COUNT(*) AS Num
-FROM Creazione C, Artefatto A
-WHERE A.Codice = C.Codice AND C.Nome = 'Leonardo' AND C.Cognome = 'da Vinci' 
-GROUP BY A.Esposizione)
+FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A
+WHERE A.Codice = C.Codice AND C.Nome = nom AND C.Cognome = cogn
+GROUP BY A.Area)
 
 
 
@@ -366,3 +381,4 @@ GROUP BY A.Esposizione)
 
 
 CREATE INDEX index_visits ON Visita_Guidata ( Data_Visita );
+DROP INDEX index_visits; 
