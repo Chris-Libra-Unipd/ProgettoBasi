@@ -327,7 +327,7 @@ INSERT INTO Creazione (Codice, Nome, Cognome) VALUES
 
 --View
 CREATE VIEW Visita_Guidata_Estesa AS (
-SELECT ID, Area, Inizio, Fine, Guida, Data_Visita, Turno, Partecipanti, Nome, Argomento
+SELECT ID, E.Area, E.Inizio, Fine, Guida, Data_Visita, Turno, Partecipanti, Nome, Argomento
 FROM Esposizione E JOIN Visita_Guidata V ON (E.area=V.Area AND E.Inizio=V.Inizio)
 );
 
