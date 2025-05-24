@@ -4,10 +4,6 @@
 #include <string.h>
 #include "dependencies/include/libpq-fe.h"
 
-#define DBNAME "sampleDB"
-#define PSW "myPostGres"
-#define USR "postgres"
-
 #define PG_HOST " localhost " // oppure " localhost " o " postgresql "
 #define PG_USER "postgres" // il vostro nome utente
 #define PG_DB "sampleDB"// il nome del database
@@ -132,10 +128,7 @@ bool Query1(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
- 
-  //libera memoria e chiudi connessione
-  
-  PQfinish(conn);
+
   return 1;
 }
 
@@ -163,7 +156,6 @@ bool Query2(PGconn *conn){
 
   printResults(res,conn);
 
-  PQfinish(conn);
   return 1;
 
 }
@@ -195,8 +187,7 @@ bool Query3(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
-  
-  PQfinish(conn);
+
   return 1;
 
 }
@@ -225,8 +216,7 @@ bool Query4(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
-  
-  PQfinish(conn);
+
   return 1;
 
 }
@@ -261,8 +251,6 @@ bool Query5(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
- 
-  PQfinish(conn);
   return 1;
 
 }
@@ -319,6 +307,7 @@ int main(){
       printf("-");
     printf("\n\n");
   }
+   PQfinish(conn);
 
   return 0;
 }
