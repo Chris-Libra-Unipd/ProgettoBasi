@@ -338,9 +338,9 @@ FROM Esposizione E JOIN Visita_Guidata V ON (E.area=V.Area AND E.Inizio=V.Inizio
 -- query 1
 SELECT A.Area, A.Inizio, COUNT(*) AS num_esposizioni
 FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A
-WHERE C.Codice = A.Codice  AND C.Nome = nom AND C.Cognome = cogn
+WHERE C.Codice = A.Codice  AND C.Nome =  'Leonardo' AND C.Cognome = 'da Vinci'
 GROUP BY A.Area, A.Inizio
-HAVING COUNT(*) >= min
+HAVING COUNT(*) >= 1
 
 
 --query 2
