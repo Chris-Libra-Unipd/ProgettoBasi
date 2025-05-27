@@ -345,13 +345,14 @@ HAVING COUNT(*) >= 1;
 --query 2
 SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti
 FROM (Ingresso_Guidato  join Biglietto On Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E
-WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = arg
+WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = ‘Rinascimento’
 GROUP BY IG.Data_Acq;
+
 
 --query 3
 SELECT AVG(A.Partecipanti) AS partecipanti_medi, COUNT(*) AS num_visite
 FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A
-WHERE A.Data_visita >= dt AND A.Argomento = arg;
+WHERE A.Data_visita >=  '2015-12-01'  AND A.Argomento = 'Rinascimento';
 
 
 --query 4
@@ -359,24 +360,22 @@ SELECT CF, NumVisite
 FROM (
     SELECT VG.Guida AS CF, COUNT(*) AS NumVisite
     FROM Visita_Guidata_Estesa VG
-    WHERE Argomento = arg
+    WHERE Argomento = ‘Rinascimento’
     GROUP BY VG.Guida
 ) AS A
 ORDER BY NumVisite DESC
 LIMIT 1;
 
-
---
 --query 5
 SELECT AVG(Num) AS media_artefatti
 FROM	(SELECT COUNT(*) AS Num
 FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A
-WHERE A.Codice = C.Codice AND C.Nome = nom AND C.Cognome = cogn
+WHERE A.Codice = C.Codice AND C.Nome =  'Leonardo' AND C.Cognome = 'da Vinci'
 GROUP BY A.Area);
 
 
 
--- Inidci
+-- Indice
 
 
 CREATE INDEX index_visits ON Visita_Guidata ( Data_Visita );
