@@ -333,26 +333,25 @@ FROM Esposizione E JOIN Visita_Guidata V ON (E.area=V.Area AND E.Inizio=V.Inizio
 
 
 
-
 -- Query
 -- query 1
 SELECT A.Area, A.Inizio, COUNT(*) AS num_esposizioni
 FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A
 WHERE C.Codice = A.Codice  AND C.Nome =  'Leonardo' AND C.Cognome = 'da Vinci'
 GROUP BY A.Area, A.Inizio
-HAVING COUNT(*) >= 1
+HAVING COUNT(*) >= 1;
 
 
 --query 2
 SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti
 FROM (Ingresso_Guidato  join Biglietto On Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E
 WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = arg
-GROUP BY IG.Data_Acq
+GROUP BY IG.Data_Acq;
 
 --query 3
 SELECT AVG(A.Partecipanti) AS partecipanti_medi, COUNT(*) AS num_visite
 FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A
-WHERE A.Data_visita >= dt AND A.Argomento = arg
+WHERE A.Data_visita >= dt AND A.Argomento = arg;
 
 
 --query 4
@@ -373,7 +372,7 @@ SELECT AVG(Num) AS media_artefatti
 FROM	(SELECT COUNT(*) AS Num
 FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A
 WHERE A.Codice = C.Codice AND C.Nome = nom AND C.Cognome = cogn
-GROUP BY A.Area)
+GROUP BY A.Area);
 
 
 
