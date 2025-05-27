@@ -1,3 +1,4 @@
+DROP VIEW  IF EXISTS Conteggio_Visite;
 DROP VIEW  IF EXISTS Visita_Guidata_Estesa;
 
 DROP TABLE  IF EXISTS Creazione;
@@ -332,6 +333,13 @@ FROM Esposizione E JOIN Visita_Guidata V ON (E.area=V.Area AND E.Inizio=V.Inizio
 );
 
 
+CREATE VIEW Conteggio_Visite AS (
+SELECT  Guida, Argomento, COUNT(*) AS NumVisite
+FROM Esposizione E JOIN Visita_Guidata V ON (E.area=V.Area AND E.Inizio=V.Inizio)
+GROUP BY Guida, Argomento
+);
+
+
 
 -- Query
 -- query 1
@@ -365,6 +373,15 @@ FROM (
 ) AS A
 ORDER BY NumVisite DESC
 LIMIT 1;
+--------------------------------------
+
+    SELECT Guida AS CF,  NumVisite
+    FROM Conteggio_Visite VG
+    WHERE Argomento = 'Rinascimento' AND NumVisite=(SELECT MAX(NumVisite)
+                                                    FROM Conteggio_Visite)
+    
+
+
 
 --query 5
 SELECT AVG(Num) AS media_artefatti

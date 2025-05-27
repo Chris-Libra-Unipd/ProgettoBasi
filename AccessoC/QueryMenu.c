@@ -4,7 +4,7 @@
 #include <string.h>
 #include "dependencies/include/libpq-fe.h"
 
-#define PG_HOST " localhost " // oppure " localhost " o " postgresql "
+#define PG_HOST "127.0.0.1" // oppure " localhost " o " postgresql "
 #define PG_USER "postgres" // il vostro nome utente
 #define PG_DB "primo"// il nome del database
 #define PG_PASS  "12340"// la vostra password
@@ -165,7 +165,7 @@ bool Query3(PGconn *conn){
   Contare il numero di visite guidate che hanno tenuto visite guidate in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti
   */
   printf("Inserire i parametri della query\n");
-  char data[12];
+  char data[30];
   printf("Inserire la data nel formato AAAA-MM-GG:\n");
   scanf("%s",&data);
 
