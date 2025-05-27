@@ -345,7 +345,7 @@ HAVING COUNT(*) >= 1;
 --query 2
 SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti
 FROM (Ingresso_Guidato  join Biglietto On Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E
-WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = ‘Rinascimento’
+WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = 'Rinascimento'
 GROUP BY IG.Data_Acq;
 
 
@@ -360,7 +360,7 @@ SELECT CF, NumVisite
 FROM (
     SELECT VG.Guida AS CF, COUNT(*) AS NumVisite
     FROM Visita_Guidata_Estesa VG
-    WHERE Argomento = ‘Rinascimento’
+    WHERE Argomento = 'Rinascimento'
     GROUP BY VG.Guida
 ) AS A
 ORDER BY NumVisite DESC
