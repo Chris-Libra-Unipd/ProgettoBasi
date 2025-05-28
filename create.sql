@@ -202,8 +202,8 @@ INSERT INTO Esposizione (Area, Nome, Inizio, Fine, Argomento) VALUES
 ('Area1', 'Maestri Rinascimentali', '2023-01-15', '2023-06-15', 'Rinascimento'),
 ('Area2', 'Luce e Colore', '2023-02-01', '2023-07-31', 'Impressionismo'),
 ('Area3', 'Forme Spezzate', '2023-03-10', '2024-08-20', 'Cubismo'),
-('Area1', 'Modernità in Mostra', '2023-09-01', '2024-01-31', 'Arte Moderna'),
-('Area2', 'Contemporanei a Confronto', '2023-10-15', '2024-03-15', 'Arte Contemporanea');
+('Area1', 'Modernità in Mostra', '2023-09-01', '2024-01-31', 'Cubismo'),
+('Area2', 'Contemporanei a Confronto', '2023-10-15', '2024-03-15', 'Rinascimento');
 
 INSERT INTO Artefatto (Codice, Nome, Tipologia) VALUES
 ('A001', 'Monna Lisa', 'Opera'),
@@ -327,11 +327,6 @@ INSERT INTO Creazione (Codice, Nome, Cognome) VALUES
 
 
 --View
-CREATE VIEW Visita_Guidata_Estesa AS (
-SELECT ID, E.Area, E.Inizio, Fine, Guida, Data_Visita, Turno, Partecipanti, Nome, Argomento
-FROM Esposizione E JOIN Visita_Guidata V ON (E.area=V.Area AND E.Inizio=V.Inizio)
-);
-
 
 CREATE VIEW Conteggio_Visite AS (
 SELECT  Guida, Argomento, COUNT(*) AS NumVisite
@@ -364,21 +359,11 @@ WHERE A.Data_visita >=  '2015-12-01'  AND A.Argomento = 'Rinascimento';
 
 
 --query 4
-SELECT CF, NumVisite
-FROM (
-    SELECT VG.Guida AS CF, COUNT(*) AS NumVisite
-    FROM Visita_Guidata_Estesa VG
-    WHERE Argomento = 'Rinascimento'
-    GROUP BY VG.Guida
-) AS A
-ORDER BY NumVisite DESC
-LIMIT 1;
---------------------------------------
 
-    SELECT Guida AS CF,  NumVisite
-    FROM Conteggio_Visite VG
-    WHERE Argomento = 'Rinascimento' AND NumVisite=(SELECT MAX(NumVisite)
-                                                    FROM Conteggio_Visite)
+SELECT Guida AS CF,  NumVisite
+FROM Conteggio_Visite VG
+WHERE Argomento = 'Rinascimento' AND NumVisite=(SELECT MAX(NumVisite)
+                                                FROM Conteggio_Visite);
     
 
 
