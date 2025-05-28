@@ -205,7 +205,7 @@ bool Query4(PGconn *conn){
   char argStr[32];
   strcpy(argStr, argomento);
 
-  sprintf(query, "SELECT Guida AS CF,  NumVisite FROM Conteggio_Visite VG WHERE Argomento = /'%s/' AND NumVisite=( 	SELECT MAX(NumVisite) FROM Conteggio_Visite); ",argStr);
+  sprintf(query, "SELECT Guida AS CF, NumVisite FROM Conteggio_Visite VG WHERE Argomento = /'%s/' AND NumVisite=(SELECT MAX(NumVisite) FROM Conteggio_Visite); ",argStr);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
