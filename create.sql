@@ -202,8 +202,8 @@ INSERT INTO Esposizione (Area, Nome, Inizio, Fine, Argomento) VALUES
 ('Area1', 'Maestri Rinascimentali', '2023-01-15', '2023-06-15', 'Rinascimento'),
 ('Area2', 'Luce e Colore', '2023-02-01', '2023-07-31', 'Impressionismo'),
 ('Area3', 'Forme Spezzate', '2023-03-10', '2024-08-20', 'Cubismo'),
-('Area1', 'Modernità in Mostra', '2023-09-01', '2024-01-31', 'Cubismo'),
-('Area2', 'Contemporanei a Confronto', '2023-10-15', '2024-03-15', 'Rinascimento');
+('Area1', 'Cubismo in Mostra', '2023-09-01', '2024-01-31', 'Cubismo'),
+('Area2', 'Rinascimento a Confronto', '2023-10-15', '2024-03-15', 'Rinascimento');
 
 INSERT INTO Artefatto (Codice, Nome, Tipologia) VALUES
 ('A001', 'Monna Lisa', 'Opera'),
