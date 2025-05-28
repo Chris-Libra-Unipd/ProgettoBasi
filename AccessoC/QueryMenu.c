@@ -27,7 +27,7 @@ void checkResults ( PGresult * res , const PGconn * conn ) {
 
 //---------------------------------
 
-void sceltaArgomento(char** argomento, PGconn * conn ){  
+void sceltaArgomento(char** argomento, PGconn * conn ){
   //recupero argomenti disponibili dal db
   PGresult *dbArgs = PQexec(conn, "SELECT * FROM argomento");
   checkResults(dbArgs,conn);
@@ -61,7 +61,7 @@ void sceltaArtista(char** nome, char** cognome, PGconn * conn){//double pointer 
 
   *nome = PQgetvalue(ncArtisti,scelta,0);
   *cognome = PQgetvalue(ncArtisti,scelta,1);
-  PQclear(ncArtisti);  
+  PQclear(ncArtisti);
 }
 //---------------------------------
 
@@ -71,7 +71,7 @@ void printResults ( PGresult * res, const PGconn * conn ){
     // Trovo il numero di tuple e campi selezionati
     int tuple = PQntuples ( res ) ;
     int campi = PQnfields ( res ) ;
-    
+
     // Stampo le intestazioni delle colonne
     for ( int i = 0; i < campi ; i ++) {
         char * temp=PQfname ( res , i );
@@ -100,7 +100,7 @@ void printResults ( PGresult * res, const PGconn * conn ){
 
 bool Query1(PGconn *conn){
   /*
-  Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti. 
+  Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti.
   */
   int numero;
   char* nome;
@@ -128,7 +128,7 @@ bool Query1(PGconn *conn){
 
   //printResults, libera anche res
   printResults(res,conn);
- 
+
   return 1;
 }
 
@@ -184,7 +184,7 @@ bool Query3(PGconn *conn){
   PGresult *res = PQexec(conn, query);
 
   printResults(res,conn);
-  
+
   return 1;
 
 }
@@ -205,7 +205,7 @@ bool Query4(PGconn *conn){
   char argStr[32];
   strcpy(argStr, argomento);
 
-  sprintf(query, "SELECT CF, NumVisite FROM (SELECT VG.Guida AS CF, COUNT(*) AS NumVisite FROM Visita_Guidata_Estesa VG WHERE Argomento = \'%s\' GROUP BY VG.Guida ) AS A ORDER BY NumVisite DESC LIMIT 1; ",argStr);
+  sprintf(query, "SELECT Guida AS CF,  NumVisite FROM Conteggio_Visite VG WHERE Argomento = /'%s/' AND NumVisite=( 	SELECT MAX(NumVisite) FROM Conteggio_Visite); ",argStr);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -258,7 +258,7 @@ int main(){
 
   PGconn *conn;
   char conninfo [250];
-  
+
   //sprintf ( conninfo , "user=%s password=%s dbname=%s",PG_USER , PG_PASS , PG_DB) ;
   sprintf ( conninfo , "user=%s password=%s dbname=%s hostaddr=%s port=%d",PG_USER , PG_PASS , PG_DB , PG_HOST , PG_PORT ) ;
   conn = PQconnectdb(conninfo); //Connessione al database
@@ -267,7 +267,7 @@ int main(){
     fprintf(stderr, "Connection to database failed: %s", PQerrorMessage(conn));
     do_exit(conn);
   }
-  
+
   while(num != 9){
     printf("Query menu:\n");
     printf("1- Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti.  \n");
@@ -277,7 +277,7 @@ int main(){
     printf("5- Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area.\n");
     printf("9- Esci\n");
 
-    printf("Digita il numero della query da eseguire:\n");  
+    printf("Digita il numero della query da eseguire:\n");
     scanf("%d",&num);
 
     if(num == 1){
@@ -295,7 +295,7 @@ int main(){
     else if(num == 5){
       Query5(conn);
     }
-    
+
     for(int i = 0; i < 100; i++)
       printf("-");
     printf("\n\n");
