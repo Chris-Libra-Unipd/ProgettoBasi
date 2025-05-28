@@ -258,9 +258,8 @@ int main(){
 
   PGconn *conn;
   char conninfo [250];
-  //sprintf ( conninfo , "user=%s password=%s dbname=%s hostaddr=%s port=%d",PG_USER , PG_PASS , PG_DB , PG_HOST , PG_PORT ) ;
-  //host e porta non li ricordo, ma tanto non sono obbligatori
-//  sprintf ( conninfo , "user=%s password=%s dbname=%s",PG_USER , PG_PASS , PG_DB) ;
+  
+  //sprintf ( conninfo , "user=%s password=%s dbname=%s",PG_USER , PG_PASS , PG_DB) ;
   sprintf ( conninfo , "user=%s password=%s dbname=%s hostaddr=%s port=%d",PG_USER , PG_PASS , PG_DB , PG_HOST , PG_PORT ) ;
   conn = PQconnectdb(conninfo); //Connessione al database
   if (PQstatus(conn) == CONNECTION_BAD) //Se non è possibile connettersi
