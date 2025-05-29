@@ -235,13 +235,13 @@ bool Query5(PGconn *conn){
   printf("Hai scelto l\'artista: %s %s\n",nome,cognome);
 
   //costruzione query parametrica
-  char query[500];
+  char query[600];
   char nomeArtista[32];
   char cognomeArtista[32];
   strcpy(nomeArtista,nome);
   strcpy(cognomeArtista,cognome);
 
-  sprintf(query, "SELECT IC.Curatore FROM In_corso IC, (SELECT  A.Area, A.Inizio,COUNT(*) AS Num FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A WHERE A.Codice = C.Codice AND C.Nome =  \'%s\'  AND C.Cognome = \'%s\' GROUP BY A.Area, A.Inizio) E WHERE IC.Area = E.Area AND IC.Inizio = E.Inizio AND E.Num = %d;",nome, cognomeArtista);
+  sprintf(query, "SELECT IC.Curatore FROM In_corso IC, (SELECT  A.Area, A.Inizio,COUNT(*) AS Num FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A WHERE A.Codice = C.Codice AND C.Nome =  '%s'  AND C.Cognome = '%s' GROUP BY A.Area, A.Inizio) E WHERE IC.Area = E.Area AND IC.Inizio = E.Inizio AND E.Num = %d;",nome, cognomeArtista);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
