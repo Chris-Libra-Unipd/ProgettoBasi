@@ -121,7 +121,7 @@ bool Query1(PGconn *conn){
   strcpy(nomeArtista,nome);
   strcpy(cognomeArtista,cognome);
 
-  sprintf(query, "SELECT A.Area, A.Inizio, COUNT(*) AS opere FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome = \'%s\' AND C.Cognome =\'%s\' GROUP BY A.Area, A.Inizio HAVING COUNT(*) >= %d",nome, cognomeArtista, numero);
+  sprintf(query, "SELECT A.Area, A.Inizio, COUNT(*) AS num_opere FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome = \'%s\' AND C.Cognome =\'%s\' GROUP BY A.Area, A.Inizio HAVING COUNT(*) >= %d",nome, cognomeArtista, numero);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -148,7 +148,7 @@ bool Query2(PGconn *conn){
   char argStr[32];
   strcpy(argStr, argomento);
 
-  sprintf(query, "SELECT IG.Data_Acq, COUNT(*) FROM (Ingresso_Guidato  join Biglietto On Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = \'%s\' GROUP BY IG.Data_Acq",argStr);
+  sprintf(query, "SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti FROM (Ingresso_Guidato JOIN Biglietto ON Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E WHERE VG.Area = E.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento =\'%s\'GROUP BY IG.Data_Acq;",argStr);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -162,7 +162,7 @@ bool Query2(PGconn *conn){
 
 bool Query3(PGconn *conn){
   /*
-  Contare il numero di visite guidate che hanno tenuto visite guidate in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti
+  Contare il numero di visite guidate che si sono tenute in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti
   */
   printf("Inserire i parametri della query\n");
   char data[30];
@@ -178,7 +178,7 @@ bool Query3(PGconn *conn){
   char argStr[32];
   strcpy(argStr, argomento);
 
-  sprintf(query, "SELECT AVG(A.Partecipanti), COUNT(*) FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A WHERE A.Data_visita >=\'%s\' AND A.Argomento =\'%s\'",data,argStr);
+  sprintf(query, "SELECT AVG(A.Partecipanti) AS partecipanti_medi, COUNT(*) AS num_visite FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A WHERE A.Data_visita >=  \'%s\'  AND A.Argomento = \'%s\';",data,argStr);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -193,9 +193,11 @@ bool Query3(PGconn *conn){
 
 bool Query4(PGconn *conn){
   /*
-  Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento, indicare anche il numero di visite.
+  Trovare il Codice Fiscale delle guide che hanno tenuto più visite guidate su un certo argomento, indicare anche il numero di visite, ritorna una tabella vuota se nessuna guida ha tenuto visite guidate sull’argomento.
   */
+
   printf("Inserire i parametri della query\n");
+
   char * argomento;
   sceltaArgomento(&argomento,conn);
   printf("Hai scelto l'argomento %s:\n" ,argomento);
@@ -219,14 +221,16 @@ bool Query4(PGconn *conn){
 
 bool Query5(PGconn *conn){
   /*
-  Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area.
+  Trovare il CF del curatore dell’esposizione con esattamente un certo numero di opere di un determinato artista.
   */
+  printf("Inserire i parametri della query\n");
+
+  int numero;
+  printf("Numero di artefatti: ");
+  scanf("%d",&numero);
 
   char* nome;
   char* cognome;
-
-  printf("Inserire i parametri della query\n");
-
   sceltaArtista(&nome,&cognome,conn);
   printf("Hai scelto l\'artista: %s %s\n",nome,cognome);
 
@@ -237,7 +241,7 @@ bool Query5(PGconn *conn){
   strcpy(nomeArtista,nome);
   strcpy(cognomeArtista,cognome);
 
-  sprintf(query, "SELECT AVG(Num) FROM	(SELECT COUNT(*) AS Num FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A WHERE A.Codice = C.Codice AND C.Nome = \'%s\' AND C.Cognome = \'%s\'  GROUP BY A.Area) ",nome, cognomeArtista);
+  sprintf(query, "SELECT IC.Curatore FROM In_corso IC, (SELECT  A.Area, A.Inizio,COUNT(*) AS Num FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A WHERE A.Codice = C.Codice AND C.Nome =  \'%s\'  AND C.Cognome = \'%s\' GROUP BY A.Area, A.Inizio) E WHERE IC.Area = E.Area AND IC.Inizio = E.Inizio AND E.Num = %d;",nome, cognomeArtista);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -270,11 +274,11 @@ int main(){
 
   while(num != 9){
     printf("Query menu:\n");
-    printf("1- Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti.  \n");
-    printf("2- Contare quanti biglietti ad ingresso guidato per un esposizione di un certo argomento sono stati venduti indicando anche la data di acquisto.\n");
-    printf("3- Contare il numero di visite guidate che hanno tenuto visite guidate in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti \n");
-    printf("4- Trovare il Codice Fiscale della guida che ha tenuto più visite guidate su un certo argomento, indicare anche il numero di visite.\n");
-    printf("5- Calcolare la media del numero di artefatti di un determinato artista presenti in ogni area.\n");
+    printf("1- Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti.\n");
+    printf("2- Contare quanti biglietti ad ingresso guidato per le esposizioni di un certo argomento sono stati venduti, mostrando per ciascuna data di acquisto il conteggio totale dei biglietti emessi.\n");
+    printf("3- Contare il numero di visite guidate che si sono tenute in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti\n");
+    printf("4- Trovare il Codice Fiscale delle guide che hanno tenuto più visite guidate su un certo argomento, indicare anche il numero di visite, ritorna una tabella vuota se nessuna guida ha tenuto visite guidate sull’argomento.\n");
+    printf("5- Trovare il CF del curatore dell’esposizione con esattamente un certo numero di opere di un determinato artista.\n");
     printf("9- Esci\n");
 
     printf("Digita il numero della query da eseguire:\n");
