@@ -241,7 +241,7 @@ bool Query5(PGconn *conn){
   strcpy(nomeArtista,nome);
   strcpy(cognomeArtista,cognome);
 
-  sprintf(query, "SELECT IC.Curatore FROM In_corso IC, (SELECT  A.Area, A.Inizio,COUNT(*) AS Num FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A WHERE A.Codice = C.Codice AND C.Nome =  '%s'  AND C.Cognome = '%s' GROUP BY A.Area, A.Inizio) E WHERE IC.Area = E.Area AND IC.Inizio = E.Inizio AND E.Num = %d;",nome, cognomeArtista);
+  sprintf(query, "SELECT IC.Curatore FROM In_corso IC, (SELECT  A.Area, A.Inizio,COUNT(*) AS Num FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A WHERE A.Codice = C.Codice AND C.Nome =  '%s'  AND C.Cognome = '%s' GROUP BY A.Area, A.Inizio) E WHERE IC.Area = E.Area AND IC.Inizio = E.Inizio AND E.Num = %d;",nome, cognomeArtista, numero);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -277,8 +277,8 @@ int main(){
     printf("1- Trovare le esposizioni in corso che hanno almeno un certo numero di artefatti esposti appartenenti ad un determinato autore e visualizzare il numero di artefatti.\n");
     printf("2- Contare quanti biglietti ad ingresso guidato per le esposizioni di un certo argomento sono stati venduti, mostrando per ciascuna data di acquisto il conteggio totale dei biglietti emessi.\n");
     printf("3- Contare il numero di visite guidate che si sono tenute in esposizioni di un certo argomento a partire da una certa data e calcolare la media dei loro partecipanti\n");
-    printf("4- Trovare il Codice Fiscale delle guide che hanno tenuto più visite guidate su un certo argomento, indicare anche il numero di visite, ritorna una tabella vuota se nessuna guida ha tenuto visite guidate sull’argomento.\n");
-    printf("5- Trovare il CF del curatore dell’esposizione con esattamente un certo numero di opere di un determinato artista.\n");
+    printf("4- Trovare il Codice Fiscale delle guide che hanno tenuto piu' visite guidate su un certo argomento, indicare anche il numero di visite, ritorna una tabella vuota se nessuna guida ha tenuto visite guidate sull’argomento.\n");
+    printf("5- Trovare il CF del curatore dell'esposizione con esattamente un certo numero di opere di un determinato artista.\n");
     printf("9- Esci\n");
 
     printf("Digita il numero della query da eseguire:\n");
