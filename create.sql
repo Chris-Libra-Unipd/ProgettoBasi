@@ -1,3 +1,4 @@
+DROP INDEX IF EXISTS index_visits; 
 DROP VIEW  IF EXISTS Conteggio_Visite;
 
 DROP TABLE  IF EXISTS Creazione;
@@ -235,7 +236,9 @@ INSERT INTO Appartenenza (Area, Inizio, Artefatto) VALUES
 ('Area2', '2023-02-01', 'A004'),
 ('Area2', '2023-02-01', 'A007'),
 ('Area3', '2023-03-10', 'A005'),
-('Area3', '2023-03-10', 'A008');
+('Area3', '2023-03-10', 'A008'),
+('Area3', '2023-03-10', 'A001'),
+('Area3', '2023-03-10', 'A002');
 
 
 INSERT INTO Visita_Guidata (ID, Area, Inizio, Guida, Data_Visita, Turno, Partecipanti) VALUES
@@ -339,7 +342,7 @@ GROUP BY Guida, Argomento
 
 -- Query
 -- query 1
-SELECT A.Area, A.Inizio, COUNT(*) AS num_esposizioni
+SELECT A.Area, A.Inizio, COUNT(*) AS num_opere
 FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A
 WHERE C.Codice = A.Codice  AND C.Nome =  'Leonardo' AND C.Cognome = 'da Vinci'
 GROUP BY A.Area, A.Inizio
@@ -349,7 +352,7 @@ HAVING COUNT(*) >= 1;
 --query 2
 SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti
 FROM (Ingresso_Guidato  join Biglietto On Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E
-WHERE VG.Area = e.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = 'Rinascimento'
+WHERE VG.Area = E.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento = 'Rinascimento'
 GROUP BY IG.Data_Acq;
 
 
@@ -364,17 +367,19 @@ WHERE A.Data_visita >=  '2015-12-01'  AND A.Argomento = 'Rinascimento';
 SELECT Guida AS CF,  NumVisite
 FROM Conteggio_Visite VG
 WHERE Argomento = 'Rinascimento' AND NumVisite=(SELECT MAX(NumVisite)
-                                                FROM Conteggio_Visite);
+                                                FROM Conteggio_Visite
+                                                WHERE Argomento='Rinascimento');
     
 
 
 
 --query 5
-SELECT AVG(Num) AS media_artefatti
-FROM	(SELECT COUNT(*) AS Num
+SELECT IC.Curatore
+FROM In_corso IC, (SELECT  A.Area, A.Inizio,COUNT(*) AS Num
 FROM Creazione C, (Artefatto Ar JOIN Appartenenza Ap ON Ar.Codice=Ap.Artefatto) A
-WHERE A.Codice = C.Codice AND C.Nome =  'Leonardo' AND C.Cognome = 'da Vinci'
-GROUP BY A.Area);
+WHERE A.Codice = C.Codice AND C.Nome =  'Leonardo' AND C.Cognome = 'da Vinci' 
+GROUP BY A.Area, A.Inizio) E
+WHERE IC.Area = E.Area AND IC.Inizio = E.Inizio AND E.Num = 2;
 
 
 
@@ -382,4 +387,4 @@ GROUP BY A.Area);
 
 
 CREATE INDEX index_visits ON Visita_Guidata ( Data_Visita );
-DROP INDEX index_visits; 
+
