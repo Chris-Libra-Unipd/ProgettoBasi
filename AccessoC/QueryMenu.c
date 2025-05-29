@@ -121,7 +121,7 @@ bool Query1(PGconn *conn){
   strcpy(nomeArtista,nome);
   strcpy(cognomeArtista,cognome);
 
-  sprintf(query, "SELECT A.Area, A.Inizio, COUNT(*) AS num_opere FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome = \'%s\' AND C.Cognome =\'%s\' GROUP BY A.Area, A.Inizio HAVING COUNT(*) >= %d",nome, cognomeArtista, numero);
+  sprintf(query, "SELECT A.Area, A.Inizio, COUNT(*) AS num_opere FROM Creazione C, (Artefatto JOIN Appartenenza ON Artefatto.codice=Appartenenza.Artefatto) A WHERE C.Codice = A.Codice  AND C.Nome = '%s' AND C.Cognome ='%s' GROUP BY A.Area, A.Inizio HAVING COUNT(*) >= %d",nome, cognomeArtista, numero);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -148,7 +148,7 @@ bool Query2(PGconn *conn){
   char argStr[32];
   strcpy(argStr, argomento);
 
-  sprintf(query, "SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti FROM (Ingresso_Guidato JOIN Biglietto ON Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E WHERE VG.Area = E.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento =\'%s\'GROUP BY IG.Data_Acq;",argStr);
+  sprintf(query, "SELECT IG.Data_Acq, COUNT(*) AS Num_biglietti FROM (Ingresso_Guidato JOIN Biglietto ON Ingresso_Guidato.id=Biglietto.id) IG, Visita_Guidata VG, Esposizione E WHERE VG.Area = E.Area AND VG.Inizio = E.Inizio AND IG.IDVG = VG.ID AND E.Argomento ='%s'GROUP BY IG.Data_Acq;",argStr);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
@@ -178,7 +178,7 @@ bool Query3(PGconn *conn){
   char argStr[32];
   strcpy(argStr, argomento);
 
-  sprintf(query, "SELECT AVG(A.Partecipanti) AS partecipanti_medi, COUNT(*) AS num_visite FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A WHERE A.Data_visita >=  \'%s\'  AND A.Argomento = \'%s\';",data,argStr);
+  sprintf(query, "SELECT AVG(A.Partecipanti) AS partecipanti_medi, COUNT(*) AS num_visite FROM (Visita_guidata VG JOIN Esposizione E ON VG.Area = E.Area AND VG.Inizio = E.inizio) A WHERE A.Data_visita >=  '%s'  AND A.Argomento = '%s';",data,argStr);
 
   //Esecuzione query
   PGresult *res = PQexec(conn, query);
